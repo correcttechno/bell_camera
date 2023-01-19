@@ -36,7 +36,7 @@ def startLive( index):
     print("payload_size: {}".format(payload_size))
     while True:
         while len(data) < payload_size:
-            data += conn.recv(20*1024)
+            data += conn.recv(50*1024)
             MData=data
             if not data:
                 cv2.destroyAllWindows()
@@ -49,7 +49,7 @@ def startLive( index):
        
         msg_size = struct.unpack(">L", packed_msg_size)[0]
         while len(data) < msg_size:
-            data += conn.recv(20*1024)
+            data += conn.recv(50*1024)
         frame_data = data[:msg_size]
         data = data[msg_size:]
         # unpack image using pickle 
@@ -94,3 +94,7 @@ p1.start()
 p2 = threading.Thread(target=startCam)
 p2.start()
 
+while True:
+    if(MYFR[0] is not None):
+        cv2.imshow('SERVER',MYFR[0])
+        cv2.waitKey(1)

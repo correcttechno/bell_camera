@@ -26,7 +26,7 @@ if True:
     while True:
         while len(data) < payload_size:
             print("Data geldi")
-            data += client_socket.recv(20*1024)
+            data += client_socket.recv(4*1024)
             
         # receive image row data form client socket
         packed_msg_size = data[:payload_size]
@@ -34,7 +34,7 @@ if True:
         msg_size = struct.unpack(">L", packed_msg_size)[0]
         while len(data) < msg_size:
             print("Data geldi 2")
-            data += client_socket.recv(20*1024)
+            data += client_socket.recv(4*1024)
         print("Data geldi 3")
         frame_data = data[:msg_size]
         data = data[msg_size:]

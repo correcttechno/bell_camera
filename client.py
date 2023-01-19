@@ -24,9 +24,8 @@ encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
 
 while True:
     ret, frame = cam.read()
-    # 影像縮放
     frame = imutils.resize(frame, width=320)
-    # 鏡像
+ 
     frame = cv2.flip(frame,180)
     result, image = cv2.imencode('.jpg', frame, encode_param)
     data = pickle.dumps(image, 0)
@@ -38,7 +37,6 @@ while True:
         
     img_counter += 1
 
-    # 若按下 q 鍵則離開迴圈
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     
