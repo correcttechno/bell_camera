@@ -93,7 +93,3 @@ p1.start()
 p2 = threading.Thread(target=startCam)
 p2.start()
 
-while True:
-    if(MYFR[0] is not None):
-        cv2.imshow('FRAME 1',MYFR[0])
-    cv2.waitKey(1)
