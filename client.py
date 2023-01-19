@@ -20,3 +20,4 @@ while True:
 
         # Then data
         clientsocket.sendall(message_size + data)
+        cv2.imshow('Client', frame)
