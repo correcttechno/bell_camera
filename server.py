@@ -1,7 +1,7 @@
 # Import the required modules
 import socket
 import sys
-import cv2
+import cv2,struct, base64
 import matplotlib.pyplot as plt
 import pickle
 import numpy as np
@@ -10,6 +10,9 @@ import threading
 import zlib
 import imutils
 from PIL import Image, ImageOps
+import asyncio
+import websockets
+import mediapipe as mp
 
 #HOST='162.214.48.246'
 HOST='192.168.16.106'
@@ -91,10 +94,38 @@ def startCam( ):
 p1 = threading.Thread(target=startLive,args={0})
 p1.start()
 
-p2 = threading.Thread(target=startCam)
-p2.start()
 
-while True:
-    if(MYFR[0] is not None):
-        cv2.imshow('SERVER',MYFR[0])
-        cv2.waitKey(1)
+
+
+async def transmit(websocket, path):
+    print("Client Connected !")
+    try :
+        
+
+        while MYFR[0] is not None:
+            #encoded = cv2.imencode('.jpg', frame)
+            frame = imutils.resize(MYFR[0], width=320)
+            frame = cv2.flip(frame,180)
+            result, image = cv2.imencode('.jpg', frame)
+
+            data = str(base64.b64encode(image))
+            data = data[2:len(data)-1]
+            
+            await websocket.send(data)
+            
+            # cv2.imshow("Transimission", frame)
+            
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
+       
+    except websockets.connection.ConnectionClosed as e:
+        print("Client Disconnected !")
+        
+    except:
+        print("Someting went Wrong !")
+
+start_server = websockets.serve(transmit, port=8093)
+
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
+
