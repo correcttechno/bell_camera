@@ -1,30 +1,21 @@
-import socket
 import cv2
+import numpy as np
+import socket
+import sys
 import pickle
 import struct
-import imutils
 
+cap=cv2.VideoCapture(0)
+clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+clientsocket.connect(('192.168.16.106',8089))
 
-# Client socket
-# create an INET, STREAMing socket : 
-client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-host_ip = '127.0.0.1'# Standard loopback interface address (localhost)
-port = 10053 # Port to listen on (non-privileged ports are > 1023)
-# now connect to the web server on the specified port number
-client_socket.connect((host_ip,port)) 
-vid = cv2.VideoCapture(0)
 while True:
+    ret,frame=cap.read()
+    # Serialize frame
+    data = pickle.dumps(frame)
 
-    if client_socket:
-        
-        while(vid.isOpened()):
-            img,frame = vid.read()
-            a = pickle.dumps(frame)
-            message = struct.pack("Q",len(a))+a
-            client_socket.sendall(message)
-            #cv2.imshow('Sending...',frame)
-            key = cv2.waitKey(10) 
-            if key ==13:
-                client_socket.close()
+    # Send message length first
+    message_size = struct.pack("L", len(data)) ### CHANGED
 
-    client_socket.close()
+    # Then data
+    clientsocket.sendall(message_size + data)

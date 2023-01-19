@@ -1,57 +1,45 @@
-import socket
-import cv2
 import pickle
+import socket
 import struct
-import imutils
 
+import cv2
 
-# Server socket
-# create an INET, STREAMing socket
-server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-host_name  = socket.gethostname()
-host_ip = socket.gethostbyname(host_name)
-print('HOST IP:',host_ip)
-port = 10053
-socket_address = (host_ip,port)
+HOST = '192.168.16.106'
+PORT = 8089
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print('Socket created')
-# bind the socket to the host. 
-#The values passed to bind() depend on the address family of the socket
-server_socket.bind(socket_address)
+
+s.bind((HOST, PORT))
 print('Socket bind complete')
-#listen() enables a server to accept() connections
-#listen() has a backlog parameter. 
-#It specifies the number of unaccepted connections that the system will allow before refusing new connections.
-server_socket.listen(5)
+s.listen(10)
 print('Socket now listening')
-payload_size = struct.calcsize("Q")
-data = b""
 
-if True:
-    
+conn, addr = s.accept()
 
+data = b'' ### CHANGED
+payload_size = struct.calcsize("L") ### CHANGED
 
-    while True:
-        client_socket,addr = server_socket.accept()
-        print('Connection from:',addr)
-        if client_socket:
-            #'b' or 'B'produces an instance of the bytes type instead of the str type
-            #used in handling binary data from network connections
-        
-            # Q: unsigned long long integer(8 bytes)
-            while len(data) < payload_size:
-                packet = client_socket.recv(4*1024)
-                if not packet: break
-                data+=packet
-            packed_msg_size = data[:payload_size]
-            data = data[payload_size:]
-            msg_size = struct.unpack("Q",packed_msg_size)[0]
-            while len(data) < msg_size:
-                data += client_socket.recv(4*1024)
-            frame_data = data[:msg_size]
-            data  = data[msg_size:]
-            frame = pickle.loads(frame_data)
-            cv2.imshow("Server...",frame)
-            key = cv2.waitKey(10) 
-            if key  == 13:
-                break
-    client_socket.close()
+while True:
+
+    # Retrieve message size
+    while len(data) < payload_size:
+        data += conn.recv(20*1024)
+
+    packed_msg_size = data[:payload_size]
+    data = data[payload_size:]
+    msg_size = struct.unpack("L", packed_msg_size)[0] ### CHANGED
+
+    # Retrieve all data based on message size
+    while len(data) < msg_size:
+        data += conn.recv(20*1024)
+
+    frame_data = data[:msg_size]
+    data = data[msg_size:]
+
+    # Extract frame
+    frame = pickle.loads(frame_data)
+
+    # Display
+    cv2.imshow('SERVER', frame)
+    cv2.waitKey(1)
