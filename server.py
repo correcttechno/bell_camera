@@ -11,7 +11,7 @@ import zlib
 import imutils
 from PIL import Image, ImageOps
 
-HOST='192.168.16.106'
+HOST='162.214.48.246'
 PORT=8090
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
