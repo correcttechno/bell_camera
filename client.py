@@ -11,11 +11,12 @@ clientsocket.connect(('192.168.16.106',8089))
 
 while True:
     ret,frame=cap.read()
-    # Serialize frame
-    data = pickle.dumps(frame)
+    if(cap.isOpened()):
+        # Serialize frame
+        data = pickle.dumps(frame)
 
-    # Send message length first
-    message_size = struct.pack("L", len(data)) ### CHANGED
+        # Send message length first
+        message_size = struct.pack("L", len(data)) ### CHANGED
 
-    # Then data
-    clientsocket.sendall(message_size + data)
+        # Then data
+        clientsocket.sendall(message_size + data)

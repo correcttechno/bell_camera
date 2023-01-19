@@ -9,10 +9,10 @@ PORT = 8089
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print('Socket created')
-
-s.bind((HOST, PORT))
+socket_address = (HOST,PORT)
+s.bind((socket_address))
 print('Socket bind complete')
-s.listen(10)
+s.listen(5)
 print('Socket now listening')
 
 conn, addr = s.accept()
