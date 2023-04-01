@@ -13,6 +13,7 @@ client_socket.connect((IP_ADDRESS, PORT))
 
 # Kamera akışını başlat
 video_capture = cv2.VideoCapture(0)
+video_capture.set(cv2.CAP_PROP_FPS, 24)
 
 # Görüntü kodlama ayarları
 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
