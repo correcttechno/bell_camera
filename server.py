@@ -16,37 +16,36 @@ import mediapipe as mp
 import pyaudio
 
 HOST = '192.168.16.106'
-PORT = 8076
+CAMERAPORT = 8091
+SOUNDPORT=8092
 
 CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
-s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-print('Socket created')
 
-s.bind((HOST,PORT))
-print('Socket bind complete')
-s.listen(5)
-print('Socket now listening')
+cs=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+cs.bind((HOST,CAMERAPORT))
+cs.listen(5)
+
+ss=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+ss.bind((HOST,SOUNDPORT))
+ss.listen(5)
+
+
+
+
 MYFR=[None,None]
 MData=None
 MData_Size=None
 
-p = pyaudio.PyAudio()
-stream_out = p.open(format=FORMAT,
-                             channels=CHANNELS,
-                             rate=RATE,
-                             output=True,
-                             frames_per_buffer=CHUNK_SIZE)
 
-def startLive( index):
-
-
+#kamera functions
+def startCamera( index):
     global MYFR
 
-    conn,addr=s.accept()
+    conn,addr=cs.accept()
 
     data = b""
     payload_size = struct.calcsize(">L")
@@ -71,19 +70,49 @@ def startLive( index):
             frame_data = data[:msg_size]
             data = data[msg_size:]
             # unpack image using pickle 
-
-           
-           
-            frame=pickle.loads(frame_data, fix_imports=True, encoding="uint8")
+            cv2.imshow(frame_data)
+            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-
-
-            data = conn.recv(CHUNK_SIZE)
-            stream_out.write(data)
-
             
             MYFR[index]=frame
-        
+
+
+
+
+def startSound(index):
+    p = pyaudio.PyAudio()
+    stream_out = p.open(format=FORMAT,
+                                channels=CHANNELS,
+                                rate=RATE,
+                                output=True,
+                                frames_per_buffer=CHUNK_SIZE)
+    
+    global MYFR
+    conn,addr=ss.accept()
+    p = pyaudio.PyAudio()
+
+    while True:
+        if conn:
+            while True:
+                # İstemciden gelen veriyi al
+                sounddata = conn.recv(CHUNK_SIZE)
+                stream_out.write(sounddata)
+            
+            
+
+
+
+
+
+
+#camera and sound server start
+cameraServer = threading.Thread(target=startCamera,args={0})
+cameraServer.start()
+
+soundServer = threading.Thread(target=startSound,args={0})
+soundServer.start()
+
+#websocket funcktions
 
 def startCam( ):
     global MYFR
@@ -115,8 +144,7 @@ def startCam( ):
 
 
 
-p1 = threading.Thread(target=startLive,args={0})
-p1.start()
+
 
 
 
