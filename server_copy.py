@@ -14,9 +14,9 @@ import asyncio
 import websockets
 import mediapipe as mp
 
-HOST='192.168.16.106'
+HOST='192.168.0.10'
 #HOST='192.168.16.106'
-PORT=8092
+PORT=8076
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')
@@ -31,7 +31,9 @@ MData_Size=None
 
 def startLive( index):
     global MYFR
+
     conn,addr=s.accept()
+
     data = b""
     payload_size = struct.calcsize(">L")
     print("payload_size: {}".format(payload_size))
@@ -57,11 +59,8 @@ def startLive( index):
             # unpack image using pickle 
             frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-           # cv2.show(frame)
             MYFR[index]=frame
         
-
-
 
 def startCam( ):
     global MYFR
@@ -126,11 +125,7 @@ async def transmit(websocket, path):
     except:
         print("Someting went Wrong !")
 
-
-
-
-
-start_server = websockets.serve(transmit, port=8093)
+start_server = websockets.serve(transmit, port=8077)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()

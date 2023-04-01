@@ -10,7 +10,7 @@ import imutils
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
-client_socket.connect(('192.168.16.106', 8090))
+client_socket.connect(('81.17.95.30', 8076))
 
 
 #encode to jpeg format
