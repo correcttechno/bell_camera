@@ -50,6 +50,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             # Kaydet
             stream_in.write(data)
 
+            if len(data)>0:
+                print("SES geliyor")
+
         # Stream'leri durdur ve PyAudio'yu kapat
         stream_out.stop_stream()
         stream_out.close()
