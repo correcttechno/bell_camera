@@ -1,78 +1,66 @@
 import cv2
-import io
-import socket
-import struct
-import time
-import pickle
 import numpy as np
-import imutils
 import pyaudio
+import socket
+import threading
+import time
 
+# video özellikleri
+WIDTH = 640
+HEIGHT = 480
+FPS = 30
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# client_socket.connect(('0.tcp.ngrok.io', 19194))
-#HOST='192.168.16.106'å
-#HOST='162.214.48.246'
-HOST='192.168.16.106'
-PORT=8092
-client_socket.connect((HOST, PORT))
-
-cam = cv2.VideoCapture(0)
-cam.set(cv2.CAP_PROP_FPS, 24)
-img_counter = 0
-
-#encode to jpeg format
-#encode param image quality 0 to 100. default:95
-#if you want to shrink data size, choose low image quality.
-encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
-
-
+# ses özellikleri
+FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 512
-FORMAT = pyaudio.paInt16
+CHUNK_SIZE = 1024
 
+# soket özellikleri
+IP_ADDRESS = '192.168.16.106'
+VIDEO_PORT = 5000
+AUDIO_PORT = 5001
 
-audio = pyaudio.PyAudio()
+# video sıkıştırıcı
+VIDEO_CODEC = cv2.VideoWriter_fourcc(*'H264')
+video_writer = cv2.VideoWriter('output.mp4', VIDEO_CODEC, FPS, (WIDTH, HEIGHT))
 
-# ses verisi için stream açma
-stream = audio.open(format=pyaudio.paInt16,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
+# ses sıkıştırıcı
+audio_encoder = pyaudio.PyAudio()
+audio_stream = audio_encoder.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK_SIZE)
+audio_chunk = audio_stream.read(CHUNK_SIZE)
 
+# soketler
+video_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+# görüntü kaynağı
+capture = cv2.VideoCapture(0)
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+capture.set(cv2.CAP_PROP_FPS, FPS)
 
-stream2 = audio.open(format=FORMAT ,channels=CHANNELS, rate=RATE, output=True)
+# video ve ses gönderme işlemleri
+def send_video():
+    while True:
+        ret, frame = capture.read()
+        if not ret:
+            break
+        _, jpeg_frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+        video_socket.sendto(jpeg_frame.tobytes(), (IP_ADDRESS, VIDEO_PORT))
+        video_writer.write(frame)
+
+def send_audio():
+    while True:
+        audio_chunk = audio_stream.read(CHUNK_SIZE)
+        audio_socket.sendto(audio_chunk, (IP_ADDRESS, AUDIO_PORT))
+
+# threading
+video_thread = threading.Thread(target=send_video)
+audio_thread = threading.Thread(target=send_audio)
+video_thread.start()
+audio_thread.start()
+
+# main loop
 while True:
-    ret, frame = cam.read()
-    audio_data = stream.read(CHUNK)
-
-    frame = imutils.resize(frame, width=320)
- 
-    frame = cv2.flip(frame,180)
-    result, image = cv2.imencode('.jpg', frame, encode_param)
-    data = pickle.dumps(image, 0)
-    size = len(data)
-
-
- 
-    
-
-    #stream2.write(audio_data)
-    if img_counter%2==0:
-        client_socket.sendall(struct.pack(">L", size) + data)
-        client_socket.sendall(len(audio_data).to_bytes(4, byteorder='little'))
-        client_socket.sendall(audio_data)
-
-        
-        #cv2.imshow('client',frame)
-        
-    img_counter += 1
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    
-
-cam.release()
+    time.sleep(1)
