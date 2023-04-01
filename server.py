@@ -1,59 +1,61 @@
 import cv2
-import numpy as np
 import pyaudio
 import socket
+import struct
+import numpy as np
 
-# video özellikleri
-WIDTH = 640
-HEIGHT = 480
+# bağlantı parametreleri
+IP_ADDRESS = '192.168.16.106'
+PORT = 9000
 
-# ses özellikleri
+# TCP/IP soketi oluştur
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((IP_ADDRESS, PORT))
+server_socket.listen(0)
+
+# Görüntü kodlama ayarları
+decode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+
+# PyAudio ayarları
+CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK_SIZE = 1024
 
-# soket özellikleri
-IP_ADDRESS = '192.168.16.106'
-VIDEO_PORT = 5000
-AUDIO_PORT = 5001
+# PyAudio örneği oluştur
+audio = pyaudio.PyAudio()
 
-# video ve ses alıcı soketler
-video_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-video_socket.bind((IP_ADDRESS, VIDEO_PORT))
+# Mikrofon çıkışını başlat
+stream = audio.open(format=FORMAT, channels=CHANNELS,
+                    rate=RATE, output=True,
+                    frames_per_buffer=CHUNK_SIZE)
 
-audio_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-audio_socket.bind((IP_ADDRESS, AUDIO_PORT))
-
-# video açma işlemleri
-def open_video():
-    while True:
-        try:
-            data, addr = video_socket.recvfrom(65507)
-            frame = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
-            cv2.imshow('Video', frame)
-            if cv2.waitKey(1) == ord('q'):
-                break
-        except:
-            break
-
-# ses açma işlemleri
-def open_audio():
-    audio_player = pyaudio.PyAudio()
-    audio_stream = audio_player.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True)
-    while True:
-        try:
-            data, addr = audio_socket.recvfrom(CHUNK_SIZE)
-            audio_stream.write(data)
-        except:
-            break
-
-# threading
-video_thread = threading.Thread(target=open_video)
-audio_thread = threading.Thread(target=open_audio)
-video_thread.start()
-audio_thread.start()
-
-# main loop
 while True:
-    pass
+    # Bağlantı isteği al
+    client_socket, addr = server_socket.accept()
+    # Veri paketi al
+    data = b''
+    while True:
+        packet = client_socket.recv(4096)
+        if not packet: break
+        data += packet
+    # Veri boyutlarını ayrıştır
+    video_size = struct.unpack('!L', data[:4])[0]
+    audio_size = struct.unpack('!L', data[video_size+4:video_size+8])[0]
+    # Görüntüyü ayrıştır ve göster
+    frame_encoded = data[4:video_size+4]
+    frame = cv2.imdecode(np.fromstring(frame_encoded, dtype=np.uint8), 1)
+    cv2.imshow('frame', frame)
+    cv2.waitKey(1)
+    # Ses verisini ayrıştır ve çal
+    audio_data = data[video_size+8:]
+    stream.write(audio_data)
+    # Soketi kapat
+    client_socket.close()
+
+# Kaynakları serbest bırak
+server_socket.close()
+stream.stop_stream()
+stream.close()
+audio.terminate()
+cv2.destroyAllWindows()
