@@ -1,67 +1,133 @@
-import cv2
-import numpy as np
-import pyaudio
+# Import the required modules
 import socket
+import sys
+import cv2,struct, base64
+import matplotlib.pyplot as plt
+import pickle
+import numpy as np
+import struct ## new
+import threading
+import zlib
+import imutils
+from PIL import Image, ImageOps
+import asyncio
+import websockets
+import mediapipe as mp
 
-# Video ayarları
-VIDEO_WIDTH = 640
-VIDEO_HEIGHT = 480
+HOST = '192.168.16.106'
+PORT = 8076
 
-# Ses ayarları
-CHUNK_SIZE = 1024
-SAMPLE_RATE = 44100
-CHANNELS = 1
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+print('Socket created')
 
-# Bağlantı ayarları
-SERVER_IP = '192.168.16.106'
-PORT = 8079
+s.bind((HOST,PORT))
+print('Socket bind complete')
+s.listen(5)
+print('Socket now listening')
+MYFR=[None,None]
+MData=None
+MData_Size=None
 
-# Kamera ayarları
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, VIDEO_WIDTH)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT)
+def startLive( index):
+    global MYFR
 
-# Ses aygıtı oluştur
-audio = pyaudio.PyAudio()
-stream = audio.open(format=pyaudio.paInt16, channels=CHANNELS, rate=SAMPLE_RATE, output=True, frames_per_buffer=CHUNK_SIZE)
+    conn,addr=s.accept()
 
-# Sunucu soketini oluşturma
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((SERVER_IP, PORT))
-server_socket.listen(1)
+    data = b""
+    payload_size = struct.calcsize(">L")
+    print("payload_size: {}".format(payload_size))
+    while True:
+        if conn:
+            while len(data) < payload_size:
+                data += conn.recv(50*1024)
+                MData=data
+                if not data:
+                    cv2.destroyAllWindows()
+                    conn,addr=s.accept()
+                    continue
+            # receive image row data form client socket
+            packed_msg_size = data[:payload_size]
 
-# İstemciden gelen video ve ses akışını alma
-while True:
-    # Bağlantıyı kabul etme
-    client_socket, address = server_socket.accept()
+            data = data[payload_size:]
+        
+            msg_size = struct.unpack(">L", packed_msg_size)[0]
+            while len(data) < msg_size:
+                data += conn.recv(50*1024)
+            frame_data = data[:msg_size]
+            data = data[msg_size:]
+            # unpack image using pickle 
+            cv2.imshow(frame_data)
+            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            
+            MYFR[index]=frame
+        
 
-    # Veri boyutunu okuma
-    data_size = client_socket.recv(16)
-    data_size = int(data_size.decode('utf-8').strip())
+def startCam( ):
+    global MYFR
+    global MData_Size
+    global MData
+    conn,addr=s.accept()
+    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+    img_counter = 0
+    while conn:
 
-    # Veriyi alın ve yeniden şekillendirin
-    data = b''
-    while len(data) < data_size:
-        packet = client_socket.recv(data_size - len(data))
-        if not packet:
-            break
-        data += packet
-    frame = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
+        frame = imutils.resize(MYFR[0], width=320)
+        # 鏡像
+        frame = cv2.flip(frame,180)
+        result, image = cv2.imencode('.jpg', frame, encode_param)
+        data = pickle.dumps(image, 0)
+        size = len(data)
 
-    # Ses verisini okuyun
-    audio_data = client_socket.recv(CHUNK_SIZE)
+        if img_counter%10==0:
+            conn.sendall(struct.pack(">L", size) + data)
+            #cv2.imshow('client',frame)
+        
+    img_counter += 1
 
-    # Görüntüyü ekranda gösterin ve sesi çalın
-    cv2.imshow('Video Stream', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    stream.write(audio_data)
 
-# Temizleme
-cap.release()
-cv2.destroyAllWindows()
-stream.stop_stream()
-stream.close()
-audio.terminate()
-client_socket.close()
-server_socket.close()
+        
+        #MYFR[index]=frame
+       
+
+
+
+
+p1 = threading.Thread(target=startLive,args={0})
+p1.start()
+
+
+
+
+async def transmit(websocket, path):
+    print("Client Connected !")
+    try :
+        
+
+        while MYFR[0] is not None:
+            #encoded = cv2.imencode('.jpg', frame)
+            frame = imutils.resize(MYFR[0], width=320)
+            frame = cv2.flip(frame,180)
+            result, image = cv2.imencode('.jpg', frame)
+
+            data = str(base64.b64encode(image))
+            data = data[2:len(data)-1]
+            
+            await websocket.send(data)
+            
+            # cv2.imshow("Transimission", frame)
+            
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
+       
+    except websockets.connection.ConnectionClosed as e:
+        print("Client Disconnected !")
+        
+    except:
+        print("Someting went Wrong !")
+
+start_server = websockets.serve(transmit, port=8077)
+
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
+
