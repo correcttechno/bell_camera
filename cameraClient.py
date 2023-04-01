@@ -12,7 +12,7 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
 #HOST='192.168.16.106'å
 HOST = '192.168.16.106'
-PORT = 8076
+PORT = 8091
 
 client_socket.connect((HOST, PORT))
 
