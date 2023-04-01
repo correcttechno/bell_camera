@@ -63,7 +63,9 @@ while True:
     #stream2.write(audio_data)
     if img_counter%2==0:
         client_socket.sendall(struct.pack(">L", size) + data)
+        client_socket.sendall(len(audio_data).to_bytes(4, byteorder='little'))
         client_socket.sendall(audio_data)
+
         
         #cv2.imshow('client',frame)
         
