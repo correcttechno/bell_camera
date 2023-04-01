@@ -114,43 +114,10 @@ soundServer.start()
 
 #websocket funcktions
 
-def startCam( ):
-    global MYFR
-    global MData_Size
-    global MData
-    conn,addr=s.accept()
-    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
-    img_counter = 0
-    while conn:
-
-        frame = imutils.resize(MYFR[0], width=320)
-        # 鏡像
-        frame = cv2.flip(frame,180)
-        result, image = cv2.imencode('.jpg', frame, encode_param)
-        data = pickle.dumps(image, 0)
-        size = len(data)
-
-        if img_counter%10==0:
-            conn.sendall(struct.pack(">L", size) + data)
-            #cv2.imshow('client',frame)
-        
-    img_counter += 1
-
-
-        
-        #MYFR[index]=frame
-       
-
-
-
-
-
-
-
-
 
 async def transmit(websocket, path):
     print("Client Connected !")
+    global MYFR
     try :
         
 
@@ -176,7 +143,7 @@ async def transmit(websocket, path):
     except:
         print("Someting went Wrong !")
 
-start_server = websockets.serve(transmit, port=8077)
+start_server = websockets.serve(transmit, port=8094)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()

@@ -35,10 +35,11 @@ cam.set(cv2.CAP_PROP_FPS, 24)
 #encode to jpeg format
 #encode param image quality 0 to 100. default:95
 #if you want to shrink data size, choose low image quality.
-encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+
 
 def startCamera():
     img_counter = 0
+    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
     while True:
         ret, frame = cam.read()
         
@@ -51,7 +52,7 @@ def startCamera():
 
         if img_counter%2==0:
             if len(data)>0:
-                cameraClient.sendall(struct.pack(">L", size) + data)
+                cameraSocket.sendall(struct.pack(">L", size) + data)
             #cv2.imshow('client',frame)
             
         img_counter += 1
