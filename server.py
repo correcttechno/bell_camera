@@ -57,7 +57,7 @@ def startCamera( index):
                 MData=data
                 if not data:
                     cv2.destroyAllWindows()
-                    conn,addr=s.accept()
+                    conn,addr=cs.accept()
                     continue
             # receive image row data form client socket
             packed_msg_size = data[:payload_size]

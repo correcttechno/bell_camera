@@ -30,7 +30,7 @@ soundSocket.connect((HOST, SOUNDPORT))
 
 cam = cv2.VideoCapture(0)
 cam.set(cv2.CAP_PROP_FPS, 24)
-img_counter = 0
+
 
 #encode to jpeg format
 #encode param image quality 0 to 100. default:95
@@ -38,6 +38,7 @@ img_counter = 0
 encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
 
 def startCamera():
+    img_counter = 0
     while True:
         ret, frame = cam.read()
         
@@ -50,7 +51,7 @@ def startCamera():
 
         if img_counter%2==0:
             if len(data)>0:
-                client_socket.sendall(struct.pack(">L", size) + data)
+                cameraClient.sendall(struct.pack(">L", size) + data)
             #cv2.imshow('client',frame)
             
         img_counter += 1
@@ -71,7 +72,7 @@ def startSound():
                         frames_per_buffer=CHUNK_SIZE)
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
-        if len(data)>0:
+        if len(sounddata)>0:
             soundSocket.sendall(sounddata)
         
         
