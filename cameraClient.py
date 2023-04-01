@@ -36,7 +36,8 @@ while True:
     size = len(data)
 
     if img_counter%2==0:
-        client_socket.sendall(struct.pack(">L", size) + data)
+        if len(data)>0:
+            client_socket.sendall(struct.pack(">L", size) + data)
         #cv2.imshow('client',frame)
         
     img_counter += 1

@@ -56,8 +56,10 @@ def startLive( index):
             frame_data = data[:msg_size]
             data = data[msg_size:]
             # unpack image using pickle 
+            cv2.imshow(frame_data)
             frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            
             MYFR[index]=frame
         
 
