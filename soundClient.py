@@ -36,5 +36,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         # Ses verisini al
         data = stream_in.read(CHUNK_SIZE)
-        s.sendall(data)
+        if len(data)>0:
+            s.sendall(data)
         # Veriyi sunucuya
