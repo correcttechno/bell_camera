@@ -3,7 +3,7 @@ import pyaudio
 
 # Sunucu bilgileri
 HOST = '192.168.16.106'
-PORT = 8077
+PORT = 8078
 
 # Ses ayarları
 CHUNK_SIZE = 1024
