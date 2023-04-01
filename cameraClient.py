@@ -11,8 +11,10 @@ import imutils
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
 #HOST='192.168.16.106'å
-HOST='81.17.95.30'
-client_socket.connect((HOST, 8076))
+HOST = '192.168.16.106'
+PORT = 8076
+
+client_socket.connect((HOST, PORT))
 
 cam = cv2.VideoCapture(0)
 cam.set(cv2.CAP_PROP_FPS, 24)

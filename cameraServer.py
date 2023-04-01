@@ -14,9 +14,8 @@ import asyncio
 import websockets
 import mediapipe as mp
 
-HOST='192.168.0.10'
-#HOST='192.168.16.106'
-PORT=8076
+HOST = '192.168.16.106'
+PORT = 8076
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')

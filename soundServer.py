@@ -48,7 +48,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             # Veriyi çal
             stream_out.write(data)
             # Kaydet
-            stream_in.write(data)
+         
 
             if len(data)>0:
                 print("SES geliyor")
