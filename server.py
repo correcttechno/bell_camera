@@ -13,9 +13,15 @@ from PIL import Image, ImageOps
 import asyncio
 import websockets
 import mediapipe as mp
+import pyaudio
 
 HOST = '192.168.16.106'
 PORT = 8076
+
+CHUNK_SIZE = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')
@@ -28,7 +34,16 @@ MYFR=[None,None]
 MData=None
 MData_Size=None
 
+p = pyaudio.PyAudio()
+stream_out = p.open(format=FORMAT,
+                             channels=CHANNELS,
+                             rate=RATE,
+                             output=True,
+                             frames_per_buffer=CHUNK_SIZE)
+
 def startLive( index):
+
+
     global MYFR
 
     conn,addr=s.accept()
@@ -56,9 +71,16 @@ def startLive( index):
             frame_data = data[:msg_size]
             data = data[msg_size:]
             # unpack image using pickle 
-            cv2.imshow(frame_data)
-            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+
+           
+           
+            frame=pickle.loads(frame_data, fix_imports=True, encoding="uint8")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+
+
+            data = conn.recv(CHUNK_SIZE)
+            stream_out.write(data)
+
             
             MYFR[index]=frame
         

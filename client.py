@@ -6,6 +6,8 @@ import time
 import pickle
 import numpy as np
 import imutils
+import pyaudio
+
 
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,10 +16,25 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 HOST = '192.168.16.106'
 PORT = 8076
 
+CHUNK_SIZE = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+
 client_socket.connect((HOST, PORT))
 
 cam = cv2.VideoCapture(0)
 cam.set(cv2.CAP_PROP_FPS, 24)
+
+p = pyaudio.PyAudio()
+stream_in = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK_SIZE)
+
+
+
 img_counter = 0
 
 #encode to jpeg format
@@ -41,6 +58,10 @@ while True:
         #cv2.imshow('client',frame)
         
     img_counter += 1
+
+    sounddata = stream_in.read(CHUNK_SIZE)
+    if len(data)>0:
+        client_socket.sendall(sounddata)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
