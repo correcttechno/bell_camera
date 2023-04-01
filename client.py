@@ -1,55 +1,39 @@
-import cv2
-import pyaudio
 import socket
-import struct
+import pyaudio
 
-# bağlantı parametreleri
-IP_ADDRESS = '192.168.16.106'
+# Sunucu bilgileri
+HOST = '192.168.16.106'
 PORT = 8077
 
-# TCP/IP soketi oluştur
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((IP_ADDRESS, PORT))
-
-# Kamera akışını başlat
-video_capture = cv2.VideoCapture(0)
-video_capture.set(cv2.CAP_PROP_FPS, 24)
-
-# Görüntü kodlama ayarları
-encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-
-# PyAudio ayarları
+# Ses ayarları
 CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
-# PyAudio örneği oluştur
-audio = pyaudio.PyAudio()
+# Socket oluşturma
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    # Sunucuya bağlanma
+    s.connect((HOST, PORT))
+    print('Sunucuya bağlandı')
 
-# Mikrofon akışını başlat
-stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, input=True,
-                    frames_per_buffer=CHUNK_SIZE)
+    # PyAudio'yu başlat
+    p = pyaudio.PyAudio()
+    # Kayıt stream'i oluştur
+    stream_in = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK_SIZE)
+    # Çalma stream'i oluştur
+    stream_out = p.open(format=FORMAT,
+                         channels=CHANNELS,
+                         rate=RATE,
+                         output=True,
+                         frames_per_buffer=CHUNK_SIZE)
 
-while True:
-    # Görüntü yakala
-    ret, frame = video_capture.read()
-    # Görüntüyü kodla
-    result, frame_encoded = cv2.imencode('.jpg', frame, encode_param)
-    # Ses verisi oku
-    audio_data = stream.read(CHUNK_SIZE)
-    # Veri boyutlarını hesapla
-    video_size = struct.pack('!L', len(frame_encoded))
-    audio_size = struct.pack('!L', len(audio_data))
-    # Verileri bir araya getir ve paketle
-    packet = video_size + frame_encoded.tobytes() + audio_size + audio_data
-    # Paketi gönder
-    client_socket.sendall(packet)
-
-# Kaynakları serbest bırak
-video_capture.release()
-stream.stop_stream()
-stream.close()
-audio.terminate()
-client_socket.close()
+    # Sonsuz döngü
+    while True:
+        # Ses verisini al
+        data = stream_in.read(CHUNK_SIZE)
+        # Veriyi sunucuya
