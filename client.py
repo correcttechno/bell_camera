@@ -5,7 +5,7 @@ import struct
 
 # bağlantı parametreleri
 IP_ADDRESS = '192.168.16.106'
-PORT = 9001
+PORT = 8076
 
 # TCP/IP soketi oluştur
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
