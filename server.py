@@ -15,16 +15,16 @@ from PIL import Image, ImageOps
 import asyncio
 import websockets
 import mediapipe as mp
-import pyaudio
-from pydub import AudioSegment
+#import pyaudio
+#from pydub import AudioSegment
 
 
-HOST = '192.168.16.106'
+HOST = '162.214.48.246'
 CAMERAPORT = 8091
 SOUNDPORT=8092
 
 CHUNK_SIZE = 512
-FORMAT = pyaudio.paInt16
+#FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 SAMPLE_RATE = 44100
@@ -101,12 +101,12 @@ def startSoundBind(index):
 
 
 
-p = pyaudio.PyAudio()
-stream_out = p.open(format=FORMAT,
-                                channels=CHANNELS,
-                                rate=RATE,
-                                output=True,
-                                frames_per_buffer=CHUNK_SIZE)
+#p = pyaudio.PyAudio()
+#stream_out = p.open(format=FORMAT,
+#                                channels=CHANNELS,
+#                                rate=RATE,
+#                                output=True,
+#                                frames_per_buffer=CHUNK_SIZE)
 
 
 
@@ -121,7 +121,7 @@ def startSound(index):
                     # İstemciden gelen veriyi al
             sounddata = CLIENTS[0].recv(CHUNK_SIZE)
             
-            stream_out.write(sounddata)
+            #stream_out.write(sounddata)
             
 
             CLIENTS[1].sendall(sounddata)   
