@@ -1,4 +1,5 @@
 # Import the required modules
+from io import BytesIO
 import socket
 import sys
 import cv2,struct, base64
@@ -14,12 +15,14 @@ import asyncio
 import websockets
 import mediapipe as mp
 import pyaudio
+from pydub import AudioSegment
+
 
 HOST = '192.168.16.106'
 CAMERAPORT = 8091
 SOUNDPORT=8092
 
-CHUNK_SIZE = 1024
+CHUNK_SIZE = 512
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
@@ -39,6 +42,8 @@ ss.listen(5)
 MYFR=[None,None]
 MData=None
 MData_Size=None
+
+
 
 
 #kamera functions
@@ -74,31 +79,51 @@ def startCamera( index):
             frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             
-            MYFR[index]=frame
+            #MYFR[index]=frame
 
 
 
+CLIENTS=[]
+SOUNDTHREAD=[]
 
-def startSound(index):
-    p = pyaudio.PyAudio()
-    stream_out = p.open(format=FORMAT,
+def startSoundBind(index):
+    while True:
+        conn,addr=ss.accept()
+        CLIENTS.append(conn)
+        print("YENI BAGLANTI")
+        print(len(CLIENTS))
+        id=len(CLIENTS)-1
+        
+        
+
+
+
+p = pyaudio.PyAudio()
+stream_out = p.open(format=FORMAT,
                                 channels=CHANNELS,
                                 rate=RATE,
                                 output=True,
                                 frames_per_buffer=CHUNK_SIZE)
-    
-    global MYFR
-    conn,addr=ss.accept()
-    p = pyaudio.PyAudio()
 
+
+
+def startSound(index):
+    global MYFR
+
+
+    
     while True:
-        if conn:
-            while True:
-                # İstemciden gelen veriyi al
-                sounddata = conn.recv(CHUNK_SIZE)
-                stream_out.write(sounddata)
+        if len(CLIENTS)>=2:
+            print("ISMEL BASLADI")
+                    # İstemciden gelen veriyi al
+            sounddata = CLIENTS[0].recv(CHUNK_SIZE)
+            stream_out.write(sounddata)
+            CLIENTS[1].sendall(sounddata)   
+            #for c in CLIENTS:
+                #c.send(sounddata)               
+                
             
-            
+threading.Thread(target=startSound,args={0}).start()
 
 
 
@@ -109,42 +134,8 @@ def startSound(index):
 cameraServer = threading.Thread(target=startCamera,args={0})
 cameraServer.start()
 
-soundServer = threading.Thread(target=startSound,args={0})
-soundServer.start()
 
+soundServerBind=threading.Thread(target=startSoundBind,args={0})
+soundServerBind.start()
 #websocket funcktions
-
-
-async def transmit(websocket, path):
-    print("Client Connected !")
-    global MYFR
-    try :
-        
-
-        while MYFR[0] is not None:
-            #encoded = cv2.imencode('.jpg', frame)
-            frame = imutils.resize(MYFR[0], width=320)
-            frame = cv2.flip(frame,180)
-            result, image = cv2.imencode('.jpg', frame)
-
-            data = str(base64.b64encode(image))
-            data = data[2:len(data)-1]
-            
-            await websocket.send(data)
-            
-            # cv2.imshow("Transimission", frame)
-            
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
-       
-    except websockets.connection.ConnectionClosed as e:
-        print("Client Disconnected !")
-        
-    except:
-        print("Someting went Wrong !")
-
-start_server = websockets.serve(transmit, port=8094)
-
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
 
