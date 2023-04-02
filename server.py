@@ -1,5 +1,6 @@
 # Import the required modules
 from io import BytesIO
+import io
 import socket
 import sys
 import cv2,struct, base64
@@ -26,6 +27,8 @@ CHUNK_SIZE = 512
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
+SAMPLE_RATE = 44100
+SAMPLE_WIDTH = 2
 
 
 cs=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -117,7 +120,10 @@ def startSound(index):
             print("ISMEL BASLADI")
                     # İstemciden gelen veriyi al
             sounddata = CLIENTS[0].recv(CHUNK_SIZE)
+            
             stream_out.write(sounddata)
+            
+
             CLIENTS[1].sendall(sounddata)   
             #for c in CLIENTS:
                 #c.send(sounddata)               
