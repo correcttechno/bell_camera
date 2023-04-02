@@ -12,7 +12,7 @@ import threading
 
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
 #HOST='192.168.16.106'å
-HOST = '162.214.48.246'
+HOST = '192.168.16.104'
 CAMERAPORT = 8091
 SOUNDPORT=8092
 

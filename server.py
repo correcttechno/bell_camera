@@ -19,7 +19,7 @@ import mediapipe as mp
 #from pydub import AudioSegment
 
 
-HOST = '162.214.48.246'
+HOST = '192.168.16.104'
 CAMERAPORT = 8091
 SOUNDPORT=8092
 
@@ -46,22 +46,27 @@ MYFR=[None,None]
 MData=None
 MData_Size=None
 
+cameraCLIENTS=[]
+soundCLIENTS=[]
 
 
 
 #kamera functions
+
+def startCameraBind(index):
+    while True:
+        conn,addr=cs.accept()
+        cameraCLIENTS.append(conn)
+
+
 def startCamera( index):
-    global MYFR
-
-    conn,addr=cs.accept()
-
     data = b""
     payload_size = struct.calcsize(">L")
     print("payload_size: {}".format(payload_size))
     while True:
-        if conn:
+        if len(cameraCLIENTS)>=2:
             while len(data) < payload_size:
-                data += conn.recv(50*1024)
+                data += cameraCLIENTS[0].recv(50*1024)
                 MData=data
                 if not data:
                     cv2.destroyAllWindows()
@@ -81,23 +86,13 @@ def startCamera( index):
             
             frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            cameraCLIENTS[1].sendall(frame)
             
             #MYFR[index]=frame
+threading.Thread(target=startCamera,args={0}).start()
 
 
 
-CLIENTS=[]
-SOUNDTHREAD=[]
-
-def startSoundBind(index):
-    while True:
-        conn,addr=ss.accept()
-        CLIENTS.append(conn)
-        print("YENI BAGLANTI")
-        print(len(CLIENTS))
-        id=len(CLIENTS)-1
-        
-        
 
 
 
@@ -110,21 +105,24 @@ def startSoundBind(index):
 
 
 
-def startSound(index):
-    global MYFR
-
-
-    
+def startSoundBind(index):
     while True:
-        if len(CLIENTS)>=2:
+        conn,addr=ss.accept()
+        soundCLIENTS.append(conn)
+       
+def startSound(index):
+    
+
+    while True:
+        if len(soundCLIENTS)>=2:
             print("ISMEL BASLADI")
                     # İstemciden gelen veriyi al
-            sounddata = CLIENTS[0].recv(CHUNK_SIZE)
+            sounddata = soundCLIENTS[0].recv(CHUNK_SIZE)
             
             #stream_out.write(sounddata)
             
 
-            CLIENTS[1].sendall(sounddata)   
+            soundCLIENTS[1].sendall(sounddata)   
             #for c in CLIENTS:
                 #c.send(sounddata)               
                 
@@ -136,9 +134,10 @@ threading.Thread(target=startSound,args={0}).start()
 
 
 
-#camera and sound server start
-cameraServer = threading.Thread(target=startCamera,args={0})
-cameraServer.start()
+
+
+cameraServerBind=threading.Thread(target=startCameraBind,args={0})
+cameraServerBind.start()
 
 
 soundServerBind=threading.Thread(target=startSoundBind,args={0})
