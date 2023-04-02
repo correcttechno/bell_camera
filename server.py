@@ -19,7 +19,7 @@ import mediapipe as mp
 #from pydub import AudioSegment
 
 
-HOST = '192.168.16.104'
+HOST = '192.168.16.106'
 CAMERAPORT = 8091
 SOUNDPORT=8092
 
