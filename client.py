@@ -43,19 +43,14 @@ def startCamera():
     while True:
         ret, frame = cam.read()
         
-        frame = imutils.resize(frame, width=320)
-    
-        frame = cv2.flip(frame,180)
-        result, image = cv2.imencode('.jpg', frame, encode_param)
-        data = pickle.dumps(image, 0)
-        size = len(data)
+        data = pickle.dumps(frame)
+        message_size = struct.pack("L", len(data))
 
-        if img_counter%2==0:
-            if len(data)>0:
-                cameraSocket.sendall(struct.pack(">L", size) + data)
-            #cv2.imshow('client',frame)
-            
-        img_counter += 1
+        # Veri boyutunu sunucuya gönderme
+        cameraSocket.sendall(message_size)
+
+        # Veriyi sunucuya gönderme
+        cameraSocket.sendall(data)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

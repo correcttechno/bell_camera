@@ -64,30 +64,22 @@ def startCamera( index):
     payload_size = struct.calcsize(">L")
     print("payload_size: {}".format(payload_size))
     while True:
-        if len(cameraCLIENTS)>=2:
+        if len(cameraCLIENTS)>=1:
             while len(data) < payload_size:
-                data += cameraCLIENTS[0].recv(50*1024)
-                MData=data
-                if not data:
-                    cv2.destroyAllWindows()
-                    conn,addr=cs.accept()
-                    continue
-            # receive image row data form client socket
+                data += cameraCLIENTS[0].recv(4096)
             packed_msg_size = data[:payload_size]
-
             data = data[payload_size:]
-        
-            msg_size = struct.unpack(">L", packed_msg_size)[0]
+            msg_size = struct.unpack("L", packed_msg_size)[0]
+
+            # Veriyi al
             while len(data) < msg_size:
-                data += conn.recv(50*1024)
+                data += cameraCLIENTS[0].recv(4096)
             frame_data = data[:msg_size]
             data = data[msg_size:]
-            # unpack image using pickle 
-            
-            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
-            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-            cameraCLIENTS[1].sendall(frame)
-            
+
+            # Veriyi ayrıştırma ve ekranda gösterme
+            frame = pickle.loads(frame_data)
+            cv2.imshow('frame', frame)
             #MYFR[index]=frame
 threading.Thread(target=startCamera,args={0}).start()
 
