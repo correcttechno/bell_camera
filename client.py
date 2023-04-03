@@ -38,8 +38,6 @@ cam.set(cv2.CAP_PROP_FPS, 24)
 
 
 def startCamera():
-    img_counter = 0
-    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
     while True:
         ret, frame = cam.read()
         

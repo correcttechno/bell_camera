@@ -81,7 +81,7 @@ def startCamera( index):
             # Veriyi ayrıştırma ve ekranda gösterme
             frame = pickle.loads(frame_data)
             #cv2.imshow('frame', frame)
-            cameraCLIENTS[1].sendall(frame)
+            cameraCLIENTS[1].sendall(frame_data)
             #MYFR[index]=frame
 threading.Thread(target=startCamera,args={0}).start()
 
