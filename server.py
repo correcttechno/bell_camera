@@ -61,10 +61,10 @@ def startCameraBind(index):
 
 def startCamera( index):
     data = b""
-    payload_size = struct.calcsize(">L")
+    payload_size = struct.calcsize("<L")
     
     while True:
-        if len(cameraCLIENTS)>=2:
+        if len(cameraCLIENTS)>=1:
             print("payload_size: {}".format(payload_size))
             while len(data) < payload_size:
                 data += cameraCLIENTS[0].recv(4096)
@@ -80,8 +80,14 @@ def startCamera( index):
 
             # Veriyi ayrıştırma ve ekranda gösterme
             frame = pickle.loads(frame_data)
+
+            data = np.array(data)
+            string_data = data.tostring()
+            print(string_data)
             #cv2.imshow('frame', frame)
-            cameraCLIENTS[1].sendall(frame_data)
+            #cameraCLIENTS[1].sendall(string_data)
+
+            
             #MYFR[index]=frame
 threading.Thread(target=startCamera,args={0}).start()
 
@@ -109,7 +115,7 @@ def startSound(index):
 
     while True:
         if len(soundCLIENTS)>=2:
-            print("ISMEL BASLADI")
+            #print("ISMEL BASLADI")
                     # İstemciden gelen veriyi al
             sounddata = soundCLIENTS[0].recv(CHUNK_SIZE)
             
