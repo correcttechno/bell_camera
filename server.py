@@ -64,7 +64,7 @@ def startCamera( index):
     payload_size = struct.calcsize(">L")
     
     while True:
-        if len(cameraCLIENTS)>=1:
+        if len(cameraCLIENTS)>=2:
             print("payload_size: {}".format(payload_size))
             while len(data) < payload_size:
                 data += cameraCLIENTS[0].recv(4096)
@@ -80,7 +80,8 @@ def startCamera( index):
 
             # Veriyi ayrıştırma ve ekranda gösterme
             frame = pickle.loads(frame_data)
-            cv2.imshow('frame', frame)
+            #cv2.imshow('frame', frame)
+            cameraCLIENTS[1].sendall(frame)
             #MYFR[index]=frame
 threading.Thread(target=startCamera,args={0}).start()
 
