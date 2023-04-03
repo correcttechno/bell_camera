@@ -65,30 +65,33 @@ def startCamera( index):
     
     while True:
         if len(cameraCLIENTS)>=1:
-            print("payload_size: {}".format(payload_size))
-            while len(data) < payload_size:
-                data += cameraCLIENTS[0].recv(4096)
-            packed_msg_size = data[:payload_size]
-            data = data[payload_size:]
-            msg_size = struct.unpack("<L", packed_msg_size)[0]
+            buffer = bytearray()
 
-            # Veriyi al
-            while len(data) < msg_size:
-                data += cameraCLIENTS[0].recv(4096)
-            frame_data = data[:msg_size]
-            data = data[msg_size:]
+            while True:
+                # Receive data from the client
+                data = cameraCLIENTS[0].recv(1024)
 
-            # Veriyi ayrıştırma ve ekranda gösterme
-            frame = pickle.loads(frame_data)
+                # Exit the loop if no more data is received
+                if not data:
+                    break
 
-            data = np.array(data)
-            string_data = data.tostring()
-            print(string_data)
-            #cv2.imshow('frame', frame)
-            #cameraCLIENTS[1].sendall(string_data)
+                # Append the received data to the buffer
+                buffer += data
 
-            
-            #MYFR[index]=frame
+            # Convert the image data to a NumPy array
+            img_data = np.frombuffer(buffer, dtype=np.uint8)
+
+            # Decode the JPEG image
+            img = cv2.imdecode(img_data, flags=cv2.IMREAD_COLOR)
+
+            # Save the image to a file on the server
+            filename = "image.jpg"
+            cv2.imwrite(filename, img)
+
+            # Send a response to the client
+            response = "Image received and saved successfully!"
+            cameraCLIENTS[0].sendall(response.encode())
+
 threading.Thread(target=startCamera,args={0}).start()
 
 

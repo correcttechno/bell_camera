@@ -41,12 +41,15 @@ def startCamera():
     while True:
         ret, frame = cam.read()
         
-        encoded, buffer = cv2.imencode('.jpg', frame)
-        data = pickle.dumps(buffer)
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+        _, img_encode = cv2.imencode('.jpg', frame, encode_param)
 
-        # Veri boyutunu hesaplayın ve istemciye gönderin
-        message_size = struct.pack("<L", len(data))
-        cameraSocket.sendall(message_size + data)
+        # Convert image data to bytes and send it to the server
+        data = img_encode.tobytes()
+        cameraSocket.sendall(data)
+
+        # Wait for a response from the server
+        response = cameraSocket.recv(1024)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         
