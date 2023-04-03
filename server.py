@@ -20,8 +20,8 @@ import mediapipe as mp
 
 
 HOST = '192.168.16.106'
-CAMERAPORT = 8091
-SOUNDPORT=8092
+CAMERAPORT = 8093
+SOUNDPORT=8094
 
 CHUNK_SIZE = 1024
 #FORMAT = pyaudio.paInt16
@@ -65,6 +65,7 @@ def startCamera( index):
     
     while True:
         if len(cameraCLIENTS)>=1:
+            print("STARTED")
             buffer = bytearray()
 
             while True:
