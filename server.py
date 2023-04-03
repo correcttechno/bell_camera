@@ -61,38 +61,27 @@ def startCameraBind(index):
 
 def startCamera( index):
     data = b""
-    payload_size = struct.calcsize("<L")
-    
+    payload_size = struct.calcsize(">L")
     while True:
         if len(cameraCLIENTS)>=1:
-            print("STARTED")
-            buffer = bytearray()
+            while len(data) < payload_size:
+                data += cameraCLIENTS[0].recv(50*1024)
+                
+            # receive image row data form client socket
+            packed_msg_size = data[:payload_size]
 
-            while True:
-                # Receive data from the client
-                data = cameraCLIENTS[0].recv(1024)
-
-                # Exit the loop if no more data is received
-                if not data:
-                    break
-
-                # Append the received data to the buffer
-                buffer += data
-
-            # Convert the image data to a NumPy array
-            img_data = np.frombuffer(buffer, dtype=np.uint8)
-
-            # Decode the JPEG image
-            img = cv2.imdecode(img_data, flags=cv2.IMREAD_COLOR)
-
-            # Save the image to a file on the server
-            filename = "image.jpg"
-            cv2.imwrite(filename, img)
-
-            # Send a response to the client
-            response = "Image received and saved successfully!"
-            cameraCLIENTS[0].sendall(response.encode())
-
+            data = data[payload_size:]
+        
+            msg_size = struct.unpack(">L", packed_msg_size)[0]
+            while len(data) < msg_size:
+                data += cameraCLIENTS[0].recv(50*1024)
+            frame_data = data[:msg_size]
+            data = data[msg_size:]
+            # unpack image using pickle 
+            cv2.imshow(frame_data)
+            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            
 threading.Thread(target=startCamera,args={0}).start()
 
 
