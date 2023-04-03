@@ -69,7 +69,7 @@ def startCamera( index):
                 data += cameraCLIENTS[0].recv(4096)
             packed_msg_size = data[:payload_size]
             data = data[payload_size:]
-            msg_size = struct.unpack("L", packed_msg_size)[0]
+            msg_size = struct.unpack(">L", packed_msg_size)[0]
 
             # Veriyi al
             while len(data) < msg_size:

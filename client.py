@@ -44,7 +44,7 @@ def startCamera():
         ret, frame = cam.read()
         
         data = pickle.dumps(frame)
-        message_size = struct.pack("L", len(data))
+        message_size = struct.pack(">L", len(data))
 
         # Veri boyutunu sunucuya gönderme
         cameraSocket.sendall(message_size)
