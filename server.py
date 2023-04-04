@@ -19,8 +19,8 @@ import mediapipe as mp
 #from pydub import AudioSegment
 
 
-HOST = '192.168.16.106'
-CAMERAPORT = 8093
+HOST = '192.168.0.108'
+CAMERAPORT = 8097
 SOUNDPORT=8094
 
 CHUNK_SIZE = 1024
@@ -38,6 +38,7 @@ cs.listen(5)
 ss=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 ss.bind((HOST,SOUNDPORT))
 ss.listen(5)
+
 
 
 
@@ -62,6 +63,8 @@ def startCameraBind(index):
 def startCamera( index):
     data = b""
     payload_size = struct.calcsize(">L")
+    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+    img_counter = 0
     while True:
         if len(cameraCLIENTS)>=1:
             while len(data) < payload_size:
@@ -78,10 +81,34 @@ def startCamera( index):
             frame_data = data[:msg_size]
             data = data[msg_size:]
             # unpack image using pickle 
-            cv2.imshow(frame_data)
+            
             frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+
+
+            frame = imutils.resize(frame, width=320)
+            # 鏡像
+            frame = cv2.flip(frame,180)
+            result, image = cv2.imencode('.jpg', frame, encode_param)
             
+
+        
+
+        
+                #cv2.imshow("FRAME",frame)
+            if len(cameraCLIENTS)>=2:
+                print("Gonderildi")
+                
+                mydata = struct.pack('>I', len(image.tobytes())) + image.tobytes()
+                cameraCLIENTS[1].sendall(mydata)
+                       
+                
+                
+                
+
+            
+
+
 threading.Thread(target=startCamera,args={0}).start()
 
 

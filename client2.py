@@ -1,49 +1,33 @@
 import cv2
-import io
 import socket
 import struct
-import time
-import pickle
 import numpy as np
-import imutils
+
+# Create a TCP/IP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Connect the socket to the server's IP address and port
+server_address = ('192.168.0.108', 8097)
+sock.connect(server_address)
+
+# Receive size of image
 
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# client_socket.connect(('0.tcp.ngrok.io', 19194))
-client_socket.connect(('81.17.95.30', 8076))
-
-
-#encode to jpeg format
-#encode param image quality 0 to 100. default:95
-#if you want to shrink data size, choose low image quality.
-encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
-data = b""
+# Receive image data
+img_bytes = b''
 if True:
+    size = struct.unpack('>I', sock.recv(4))[0]
     
-    ata = b""
-    payload_size = struct.calcsize(">L")
-    print("payload_size: {}".format(payload_size))
-    while True:
-        while len(data) < payload_size:
-            print("Data geldi")
-            data += client_socket.recv(4*1024)
-            
-        # receive image row data form client socket
-        packed_msg_size = data[:payload_size]
-        data = data[payload_size:]
-        msg_size = struct.unpack(">L", packed_msg_size)[0]
-        while len(data) < msg_size:
-            print("Data geldi 2")
-            data += client_socket.recv(4*1024)
-        print("Data geldi 3")
-        frame_data = data[:msg_size]
-        data = data[msg_size:]
-        # unpack image using pickle 
-        frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
-        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-        
-        cv2.imshow('CLIENT',frame)
-        cv2.waitKey(1)
-        
+    while len(img_bytes) < size:
+        img_bytes += sock.recv(4096)
 
-cam.release()
+    # Decode image data
+    img_np = np.frombuffer(img_bytes, np.uint8)
+    img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+
+    # Display image
+    cv2.imshow('Received image', img)
+    cv2.waitKey(0)
+
+# Close the socket
+#sock.close()
