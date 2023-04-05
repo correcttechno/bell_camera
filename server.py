@@ -19,7 +19,7 @@ import mediapipe as mp
 #from pydub import AudioSegment
 
 
-HOST = '192.168.0.108'
+HOST = '192.168.16.103'
 CAMERAPORT = 8097
 SOUNDPORT=8094
 
@@ -57,6 +57,7 @@ soundCLIENTS=[]
 def startCameraBind(index):
     while True:
         conn,addr=cs.accept()
+        
         cameraCLIENTS.append(conn)
 
 
@@ -99,8 +100,8 @@ def startCamera( index):
             if len(cameraCLIENTS)>=2:
                 print("Gonderildi")
                 
-                mydata = struct.pack('>I', len(image.tobytes())) + image.tobytes()
-                cameraCLIENTS[1].sendall(mydata)
+                mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
+                cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
                        
                 
                 
