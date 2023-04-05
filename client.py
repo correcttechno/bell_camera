@@ -1,47 +1,35 @@
-import cv2
+import asyncio
+import websockets
 import pyaudio
 import numpy as np
-import threading
-import websocket
-import json
 
-# Video capture object
-cap = cv2.VideoCapture(0)
+# Sabitler
+CHUNK_SIZE = 1024
+SAMPLE_RATE = 44100
+NUM_CHANNELS = 1
 
-# Audio recording object
-audio = pyaudio.PyAudio()
-stream = audio.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True, frames_per_buffer=1024)
+async def audio_client():
+    # PyAudio'yu başlat
+    audio = pyaudio.PyAudio()
 
-# WebSocket client
-ws = websocket.WebSocket()
+    # Ses verisi için bir stream aç
+    stream = audio.open(format=pyaudio.paInt16,
+                        channels=NUM_CHANNELS,
+                        rate=SAMPLE_RATE,
+                        output=True)
 
-def send_data():
-    while True:
-        # Capture video frame
-        ret, frame = cap.read()
-        if not ret:
-            break
+    async with websockets.connect("ws://192.168.16.103:8077") as websocket:
+        while True:
+            # Sunucudan ses verisini al
+            data = await websocket.recv()
 
-        # Record audio frame
-        audio_frame = stream.read(1024)
+            # Byte dizisini numpy dizisine dönüştür
+            audio_data = np.frombuffer(data, dtype=np.int16)
 
-        # Combine video and audio frames into a JSON object
-        data = {'video': frame.tolist(), 'audio': np.frombuffer(audio_frame, dtype=np.int16).tolist()}
-        json_data = json.dumps(data)
+            # Ses verisini işle veya çal
+            # ...
 
-        # Send the JSON object to the WebSocket server
-        ws.send(json_data)
+            # Ses verisini çıkış stream'ine yaz
+            stream.write(audio_data.tobytes())
 
-def on_open(ws):
-    # Start the thread that sends data to the WebSocket server
-    threading.Thread(target=send_data).start()
-
-if __name__ == '__main__':
-    # Connect to the WebSocket server
-    ws.connect('ws://192.168.16.103:8077')
-
-    # Set the on_open callback function
-    ws.on_open = on_open
-
-    # Wait for the WebSocket connection to close
-    ws.run_forever()
+asyncio.run(audio_client())

@@ -1,11 +1,36 @@
 import asyncio
 import websockets
+import pyaudio
+import numpy as np
 
-async def handle_websocket(websocket, path):
-    async for message in websocket:
-        print("Gelen Veri: ", message)
+# Sabitler
+CHUNK_SIZE = 1024
+SAMPLE_RATE = 44100
+NUM_CHANNELS = 1
 
-start_server = websockets.serve(handle_websocket, "192.168.16.103", 8077)
+async def audio_stream(websocket, path):
+    # PyAudio'yu başlat
+    audio = pyaudio.PyAudio()
 
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+    # Ses verisi için bir stream aç
+    stream = audio.open(format=pyaudio.paInt16,
+                        channels=NUM_CHANNELS,
+                        rate=SAMPLE_RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK_SIZE)
+
+    while True:
+        # Ses verisini al
+        data = stream.read(CHUNK_SIZE)
+
+        # Ses verisini işle veya kaydet
+        # ...
+
+        # Ses verisini WebSocket istemcisine gönder
+        await websocket.send(data)
+
+async def main():
+    async with websockets.serve(audio_stream, "192.168.16.103", 8077):
+        await asyncio.Future()  # Sunucu sonsuza kadar çalışır
+
+asyncio.run(main())
