@@ -1,35 +1,45 @@
+import cv2
+import numpy as np
+import pyaudio
 import asyncio
 import websockets
-import pyaudio
-import numpy as np
 
-# Sabitler
-CHUNK_SIZE = 1024
-SAMPLE_RATE = 44100
-NUM_CHANNELS = 1
+# Kamera örneğini oluştur
+cap = cv2.VideoCapture(0)
 
-async def audio_client():
-    # PyAudio'yu başlat
-    audio = pyaudio.PyAudio()
+# PyAudio örneği oluştur
+audio = pyaudio.PyAudio()
 
-    # Ses verisi için bir stream aç
-    stream = audio.open(format=pyaudio.paInt16,
-                        channels=NUM_CHANNELS,
-                        rate=SAMPLE_RATE,
-                        output=True)
+# Mikrofon için giriş cihazını aç
+stream = audio.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True, frames_per_buffer=1024)
 
-    async with websockets.connect("ws://192.168.16.103:8077") as websocket:
-        while True:
-            # Sunucudan ses verisini al
-            data = await websocket.recv()
+async def video_stream(websocket, path):
+    while True:
+        # Kameradan bir kare oku
+        ret, frame = cap.read()
 
-            # Byte dizisini numpy dizisine dönüştür
-            audio_data = np.frombuffer(data, dtype=np.int16)
+        # Kareyi JPEG formatına dönüştür ve byte dizisine kodla
+        _, img_encoded = cv2.imencode('.jpg', frame)
+        data = img_encoded.tobytes()
 
-            # Ses verisini işle veya çal
-            # ...
+        # Byte dizisini istemciye gönder
+        await websocket.send(data)
 
-            # Ses verisini çıkış stream'ine yaz
-            stream.write(audio_data.tobytes())
+async def audio_stream(websocket, path):
+    while True:
+        # Mikrofondan ses verisini al
+        data = stream.read(1024)
 
-asyncio.run(audio_client())
+        # Ses verisini istemciye gönder
+        await websocket.send(data)
+
+async def main():
+    async with websockets.connect('ws://192.168.16.103:8077/video') as video_socket, \
+            websockets.connect('ws://192.168.16.103:8078/audio') as audio_socket:
+        await asyncio.gather(
+            video_stream(video_socket, '/video'),
+            audio_stream(audio_socket, '/audio')
+        )
+
+# Ana programı çalıştır
+asyncio.run(main())
