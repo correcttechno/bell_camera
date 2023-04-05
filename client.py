@@ -17,7 +17,7 @@ async def video_stream(websocket, path):
     while True:
         # Kameradan bir kare oku
         ret, frame = cap.read()
-
+        frame=cv2.resize(frame, (320, 240))
         # Kareyi JPEG formatına dönüştür ve byte dizisine kodla
         _, img_encoded = cv2.imencode('.jpg', frame)
         data = img_encoded.tobytes()
@@ -29,6 +29,7 @@ async def audio_stream(websocket, path):
     while True:
         # Mikrofondan ses verisini al
         data = stream.read(1024)
+
 
         # Ses verisini istemciye gönder
         await websocket.send(data)

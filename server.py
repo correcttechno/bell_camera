@@ -17,7 +17,7 @@ async def video_stream(websocket, path):
     while True:
         # İstemciden gelen görüntüyü al
         data = await websocket.recv()
-
+        print("Data Goruntu oxunur")
         # Görüntü verisini numpy dizisine dönüştür
         img_array = np.frombuffer(data, dtype=np.uint8)
 
