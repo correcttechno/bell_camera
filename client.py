@@ -39,11 +39,11 @@ cam.set(cv2.CAP_PROP_FPS, 24)
 
 def startCamera():
     img_counter = 0
-    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),60]
     while True:
         ret, frame = cam.read()
     
-        frame = imutils.resize(frame, width=320)
+        frame = imutils.resize(frame, width=320,height=240)
     
         frame = cv2.flip(frame,180)
         result, image = cv2.imencode('.jpg', frame, encode_param)

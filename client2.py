@@ -7,7 +7,9 @@ import numpy as np
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Connect the socket to the server's IP address and port
-server_address = ('192.168.0.108', 8097)
+HOST = '162.214.48.246'
+CAMERAPORT = 8097
+server_address = (HOST, CAMERAPORT)
 sock.connect(server_address)
 
 # Receive size of image
