@@ -15,7 +15,7 @@ from PIL import Image, ImageOps
 import asyncio
 import websockets
 import mediapipe as mp
-#import pyaudio
+import pyaudio
 #from pydub import AudioSegment
 
 
@@ -25,7 +25,7 @@ CAMERAPORT = 8097
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
-#FORMAT = pyaudio.paInt16
+FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 SAMPLE_RATE = 44100
@@ -86,31 +86,19 @@ def startCamera( index):
             
             frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
             frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-
+            
 
             frame = imutils.resize(frame, width=320)
             # 鏡像
             frame = cv2.flip(frame,180)
             result, image = cv2.imencode('.jpg', frame, encode_param)
             
-
-        
-
-        
-                #cv2.imshow("FRAME",frame)
             if len(cameraCLIENTS)>=2:
-                print("Gonderildi")
+                print("Video Sended")
                 
                 mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
                 cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
                        
-                
-                
-                
-
-            
-
-
 threading.Thread(target=startCamera,args={0}).start()
 
 
@@ -118,12 +106,12 @@ threading.Thread(target=startCamera,args={0}).start()
 
 
 
-#p = pyaudio.PyAudio()
-#stream_out = p.open(format=FORMAT,
-#                                channels=CHANNELS,
-#                                rate=RATE,
-#                                output=True,
-#                                frames_per_buffer=CHUNK_SIZE)
+p = pyaudio.PyAudio()
+stream_out = p.open(format=FORMAT,
+                               channels=CHANNELS,
+                               rate=RATE,
+                               output=True,
+                               frames_per_buffer=CHUNK_SIZE)
 
 
 
@@ -136,17 +124,17 @@ def startSound(index):
     
 
     while True:
-        if len(soundCLIENTS)>=2:
+        if len(soundCLIENTS)>=1:
             #print("ISMEL BASLADI")
                     # İstemciden gelen veriyi al
             sounddata = soundCLIENTS[0].recv(CHUNK_SIZE)
             
             #stream_out.write(sounddata)
             
-
-            soundCLIENTS[1].sendall(sounddata)   
-            #for c in CLIENTS:
-                #c.send(sounddata)               
+            if len(soundCLIENTS)>=2:
+                print("Sound Sended")
+                soundCLIENTS[len(soundCLIENTS)-1].sendall(sounddata)   
+                     
                 
             
 threading.Thread(target=startSound,args={0}).start()
