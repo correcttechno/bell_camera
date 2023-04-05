@@ -50,7 +50,7 @@ def startCamera():
         data = pickle.dumps(image, 0)
         size = len(data)
 
-        if img_counter%2==0:
+        if img_counter%5==0:
             if len(data)>0:
                 cameraSocket.sendall(struct.pack(">L", size) + data)
             #cv2.imshow('client',frame)
