@@ -11,8 +11,8 @@ import threading
 
 
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
-HOST = '192.168.16.103'
-#HOST = '162.214.48.246'
+#HOST = '192.168.0.108'
+HOST = '162.214.48.246'
 CAMERAPORT = 8097
 SOUNDPORT=8094
 
@@ -50,7 +50,7 @@ def startCamera():
         data = pickle.dumps(image, 0)
         size = len(data)
 
-        if img_counter%5==0:
+        if img_counter%2==0:
             if len(data)>0:
                 cameraSocket.sendall(struct.pack(">L", size) + data)
             #cv2.imshow('client',frame)
@@ -70,7 +70,7 @@ def startSound():
                         rate=RATE,
                         input=True,
                         frames_per_buffer=CHUNK_SIZE)
-    while True:
+    while False:
         sounddata = stream_in.read(CHUNK_SIZE)
         if len(sounddata)>0:
             soundSocket.sendall(sounddata)

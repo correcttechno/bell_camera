@@ -15,17 +15,19 @@ from PIL import Image, ImageOps
 import asyncio
 import websockets
 import mediapipe as mp
-import pyaudio
+#import pyaudio
+from http import server
+import socketserver
 #from pydub import AudioSegment
 
 
-HOST = '192.168.16.103'
-#HOST = '162.214.48.246'
+#HOST = '192.168.0.108'
+HOST = '162.214.48.246'
 CAMERAPORT = 8097
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
-FORMAT = pyaudio.paInt16
+#FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 SAMPLE_RATE = 44100
@@ -92,7 +94,7 @@ def startCamera( index):
             # 鏡像
             frame = cv2.flip(frame,180)
             result, image = cv2.imencode('.jpg', frame, encode_param)
-            
+            MYFR[0]=image
             if len(cameraCLIENTS)>=2:
                 print("Video Sended")
                 
@@ -104,7 +106,7 @@ threading.Thread(target=startCamera,args={0}).start()
 
 
 
-
+""" 
 
 p = pyaudio.PyAudio()
 stream_out = p.open(format=FORMAT,
@@ -112,7 +114,7 @@ stream_out = p.open(format=FORMAT,
                                rate=RATE,
                                output=True,
                                frames_per_buffer=CHUNK_SIZE)
-
+ """
 
 
 def startSoundBind(index):
@@ -154,3 +156,49 @@ soundServerBind=threading.Thread(target=startSoundBind,args={0})
 soundServerBind.start()
 #websocket funcktions
 
+
+
+
+
+
+
+#HTTP SERVER LIVE STREAM
+def StartServer():
+    print("Server basladi")
+    address = ('', 8000)
+    server = StreamingServer(address, StreamingHandler)
+    server.serve_forever()
+
+
+
+class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+class StreamingHandler(server.BaseHTTPRequestHandler):
+    global MYFR
+    def do_GET(self):
+        if self.path == "/stream.mjpg":
+            self.send_response(200)
+            self.send_header('Age', 0)
+            self.send_header('Cache-Control', 'no-cache, private')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Content-Type',
+                             'multipart/x-mixed-replace; boundary=FRAME')
+            self.end_headers()
+            try:
+                #ret,img = camera.read()
+                while True:
+                    
+                    image_bytes = MYFR[0]
+                    self.wfile.write(b'--FRAME\r\n')
+                    self.send_header('Content-Type', 'image/jpeg')
+                    self.send_header('Content-Length', len(image_bytes))
+                    self.end_headers()
+                    self.wfile.write(image_bytes)
+                    self.wfile.write(b'\r\n')
+            except Exception as e:
+                print("Error")
+                #cv2.imshow("Frame",frame)
+
+threading.Thread(target=StartServer).start()
