@@ -79,6 +79,8 @@ class Calculator:
 
 
 root = tk.Tk()
+root.attributes('-fullscreen', True)
+
 calculator = Calculator(root)
 root.mainloop()
 
