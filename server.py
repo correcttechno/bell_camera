@@ -62,7 +62,8 @@ def startCameraBind(index):
         conn,addr=cs.accept()
         
         cameraCLIENTS.append(conn)
-
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 def startCamera( index):
     data = b""
@@ -100,6 +101,8 @@ def startCamera( index):
                 
                 mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
                 cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
                        
 threading.Thread(target=startCamera,args={0}).start()
 
@@ -121,6 +124,8 @@ def startSoundBind(index):
     while True:
         conn,addr=ss.accept()
         soundCLIENTS.append(conn)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
        
 def startSound(index):
     
@@ -137,7 +142,8 @@ def startSound(index):
                 print("Sound Sended")
                 soundCLIENTS[len(soundCLIENTS)-1].sendall(sounddata)   
                      
-                
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
             
 threading.Thread(target=startSound,args={0}).start()
 
