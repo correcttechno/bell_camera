@@ -23,7 +23,7 @@ import socketserver
 
 #HOST = '192.168.0.108'
 HOST = '162.214.48.246'
-CAMERAPORT = 8095
+CAMERAPORT = 8097
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
@@ -60,6 +60,7 @@ soundCLIENTS=[]
 def startCameraBind(index):
     while True:
         conn,addr=cs.accept()
+        
         cameraCLIENTS.append(conn)
 
 

@@ -13,7 +13,7 @@ import threading
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
 #HOST = '192.168.0.108'
 HOST = '162.214.48.246'
-CAMERAPORT = 8095
+CAMERAPORT = 8097
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
@@ -70,7 +70,7 @@ def startSound():
                         rate=RATE,
                         input=True,
                         frames_per_buffer=CHUNK_SIZE)
-    while True:
+    while False:
         sounddata = stream_in.read(CHUNK_SIZE)
         if len(sounddata)>0:
             soundSocket.sendall(sounddata)
