@@ -46,3 +46,39 @@ class Calculator:
                                       command=self.clear)
 
         # Tuşları düzenle
+                # Tuşları düzenleme
+        self.button_1.grid(row=3, column=0, padx=5, pady=5)
+        self.button_2.grid(row=3, column=1, padx=5, pady=5)
+        self.button_3.grid(row=3, column=2, padx=5, pady=5)
+        self.button_4.grid(row=2, column=0, padx=5, pady=5)
+        self.button_5.grid(row=2, column=1, padx=5, pady=5)
+        self.button_6.grid(row=2, column=2, padx=5, pady=5)
+        self.button_7.grid(row=1, column=0, padx=5, pady=5)
+        self.button_8.grid(row=1, column=1, padx=5, pady=5)
+        self.button_9.grid(row=1, column=2, padx=5, pady=5)
+        self.button_0.grid(row=4, column=0, padx=5, pady=5)
+        self.button_add.grid(row=1, column=3, padx=5, pady=5)
+        self.button_subtract.grid(row=2, column=3, padx=5, pady=5)
+        self.button_multiply.grid(row=3, column=3, padx=5, pady=5)
+        self.button_divide.grid(row=4, column=3, padx=5, pady=5)
+        self.button_equal.grid(row=4, column=2, padx=5, pady=5)
+        self.button_clear.grid(row=4, column=1, padx=5, pady=5)
+
+    def button_click(self, number):
+        current = self.display.get()
+        self.display.delete(0, tk.END)
+        self.display.insert(0, str(current) + str(number))
+
+    def clear(self):
+        self.display.delete(0, tk.END)
+
+    def calculate(self):
+        result = eval(self.display.get())
+        self.display.delete(0, tk.END)
+        self.display.insert(0, result)
+
+
+root = tk.Tk()
+calculator = Calculator(root)
+root.mainloop()
+
