@@ -82,7 +82,8 @@ root = tk.Tk()
 root.attributes("-fullscreen", True)
 
 # Navigasyon çubuğunu gizle
-root.attributes("-no-borders", True)
+root.overrideredirect(True)
+
 
 calculator = Calculator(root)
 root.mainloop()
