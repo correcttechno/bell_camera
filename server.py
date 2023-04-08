@@ -21,9 +21,9 @@ import socketserver
 #from pydub import AudioSegment
 
 
-HOST = '192.168.0.108'
-#HOST = '162.214.48.246'
-CAMERAPORT = 8097
+#HOST = '192.168.0.108'
+HOST = '162.214.48.246'
+CAMERAPORT = 8095
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
