@@ -96,11 +96,15 @@ def startCamera( index):
             frame = cv2.flip(frame,180)
             result, image = cv2.imencode('.jpg', frame, encode_param)
             MYFR[0]=image
-            if len(cameraCLIENTS)>=2:
-                print("Video Sended")
-                
-                mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
-                cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
+            try:
+                if len(cameraCLIENTS)>=2:
+                    print("Video Sended")
+                    
+                    mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
+                    cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
+            except :
+                print("close camera socket")
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
                        
@@ -137,10 +141,12 @@ def startSound(index):
             sounddata = soundCLIENTS[0].recv(CHUNK_SIZE)
             
             #stream_out.write(sounddata)
-            
-            if len(soundCLIENTS)>=2:
-                print("Sound Sended")
-                soundCLIENTS[len(soundCLIENTS)-1].sendall(sounddata)   
+            try:
+                if len(soundCLIENTS)>=2:
+                    print("Sound Sended")
+                    soundCLIENTS[len(soundCLIENTS)-1].sendall(sounddata)   
+            except:
+                print("close sound socket")
                      
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
