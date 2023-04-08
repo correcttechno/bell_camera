@@ -84,6 +84,7 @@ root.attributes("-fullscreen", True)
 # Navigasyon çubuğunu gizle
 root.overrideredirect(True)
 root.configure(background="purple")
+root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 
 
 
