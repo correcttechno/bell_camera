@@ -79,7 +79,10 @@ class Calculator:
 
 
 root = tk.Tk()
-root.attributes('-fullscreen', True)
+root.attributes("-fullscreen", True)
+
+# Navigasyon çubuğunu gizle
+root.attributes("-no-borders", True)
 
 calculator = Calculator(root)
 root.mainloop()
