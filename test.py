@@ -83,6 +83,8 @@ root.attributes("-fullscreen", True)
 
 # Navigasyon çubuğunu gizle
 root.overrideredirect(True)
+root.configure(background="purple")
+
 
 
 calculator = Calculator(root)
