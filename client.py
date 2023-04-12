@@ -6,7 +6,7 @@ import time
 import pickle
 import numpy as np
 import imutils
-import pyaudio
+#import pyaudio
 import threading
 
 
@@ -17,7 +17,7 @@ CAMERAPORT = 8097
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
-FORMAT = pyaudio.paInt16
+#FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 
@@ -63,7 +63,7 @@ def startCamera():
     cam.release()
 
 
-def startSound():
+""" def startSound():
     p = pyaudio.PyAudio()
     stream_in = p.open(format=FORMAT,
                         channels=CHANNELS,
@@ -75,7 +75,7 @@ def startSound():
         if len(sounddata)>0:
             soundSocket.sendall(sounddata)
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            break """
         
 
 
@@ -84,5 +84,5 @@ def startSound():
 cameraClient= threading.Thread(target=startCamera)
 cameraClient.start()
 
-soundClient= threading.Thread(target=startSound)
-soundClient.start()
+#soundClient= threading.Thread(target=startSound)
+#soundClient.start()
