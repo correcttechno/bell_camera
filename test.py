@@ -11,7 +11,7 @@ class Calculator:
         master.title("Calculator")
 
         # Metin kutusu oluşturma
-       # self.display = tk.Entry(master, width=25, font=('Arial', 14))
+        self.display = tk.Entry(master, width=25, font=('Arial', 14))
         self.display.grid(row=0, column=0, columnspan=4, pady=5)
 
         # Rakam tuşlarını oluşturma
