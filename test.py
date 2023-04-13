@@ -1,12 +1,17 @@
+#!/usr/bin/env python
+
 import tkinter as tk
+import time
+
+time.sleep(3)
 
 class Calculator:
     def __init__(self, master):
         self.master = master
-        master.title("Hesap Makinesi")
+        master.title("Calculator")
 
         # Metin kutusu oluşturma
-        self.display = tk.Entry(master, width=25, font=('Arial', 14))
+       # self.display = tk.Entry(master, width=25, font=('Arial', 14))
         self.display.grid(row=0, column=0, columnspan=4, pady=5)
 
         # Rakam tuşlarını oluşturma
