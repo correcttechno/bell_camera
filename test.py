@@ -14,6 +14,7 @@ class Calculator:
         # Metin kutusu oluşturma
         self.display = tk.Entry(master, width=25, font=('Arial', 14))
         self.display.grid(row=0, column=0, columnspan=4, pady=5)
+        print("DISPLAY IS STARTED")
 
         # Rakam tuşlarını oluşturma
         self.button_1 = tk.Button(master, text="1", width=5, height=2, font=('Arial', 14),
