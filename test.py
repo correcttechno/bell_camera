@@ -5,7 +5,6 @@
 import tkinter as tk
 import time
 
-time.sleep(30)
 
 class Calculator:
     def __init__(self, master):
