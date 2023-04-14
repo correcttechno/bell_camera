@@ -5,7 +5,7 @@
 import tkinter as tk
 import time
 
-
+print("PYTHON IS STARTED")
 class Calculator:
     def __init__(self, master):
         self.master = master
