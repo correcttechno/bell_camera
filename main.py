@@ -1,100 +1,64 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-
 import tkinter as tk
-import time
+import cv2
 
-print("PYTHON IS STARTED")
-class Calculator:
-    def __init__(self, master):
-        self.master = master
-        master.title("Calculator")
+class App:
+    def __init__(self, window, window_title):
+        self.window = window
+        self.window.title(window_title)
+        
+        # pencereyi ikiye böl
+        self.canvas = tk.Canvas(window, width=600, height=480)
+        self.canvas.pack(side=tk.LEFT)
+        
+        # hesap makinesi widget'ını oluşturun
+        self.calculator_frame = tk.Frame(window, bg="white", bd=5)
+        self.calculator_frame.place(relx=0.7, rely=0.1, relwidth=0.25, relheight=0.8, anchor="n")
+        self.label = tk.Label(self.calculator_frame, font=("Arial", 10), bg="white", anchor="e")
+        self.label.place(relx=0, rely=0, relwidth=1, relheight=0.2)
+        self.equation = ""
+        
+        # hesap makinesi butonlarını oluşturun
+        buttons = ["C", "DEL", "/", "x",
+                   "7", "8", "9", "-",
+                   "4", "5", "6", "+",
+                   "1", "2", "3", "=",
+                   "0", ".", "(", ")"]
+        x = 0
+        y = 0
+        for button in buttons:
+            command = lambda x=button: self.button_click(x)
+            tk.Button(self.calculator_frame, text=button, bg="white", fg="black", command=command).place(relx=x, rely=y, relwidth=0.25, relheight=0.2)
+            x += 0.25
+            if x >= 1:
+                x = 0
+                y += 0.2
+        
+        # video akışı widget'ını oluşturun
+        self.video = cv2.VideoCapture(0)
+        self.delay = 15 # milisaniye cinsinden
+        self.update()
+        self.window.mainloop()
+    
+    def button_click(self, key):
+        if key == "C":
+            self.equation = ""
+        elif key == "DEL":
+            self.equation = self.equation[:-1]
+        elif key == "=":
+            try:
+                self.equation = str(eval(self.equation))
+            except:
+                self.equation = "Hata!"
+        else:
+            self.equation += str(key)
+        self.label.config(text=self.equation)
+        
+    def update(self):
+        ret, frame = self.video.read()
+        if ret:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            self.photo = tk.PhotoImage(image=tk.BitmapImage(data=frame))
+            self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+        self.window.after(self.delay, self.update)
 
-        # Metin kutusu oluşturma
-        self.display = tk.Entry(master, width=25, font=('Arial', 14))
-        self.display.grid(row=0, column=0, columnspan=4, pady=5)
-        print("DISPLAY IS STARTED")
-
-        # Rakam tuşlarını oluşturma
-        self.button_1 = tk.Button(master, text="1", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('1'))
-        self.button_2 = tk.Button(master, text="2", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('2'))
-        self.button_3 = tk.Button(master, text="3", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('3'))
-        self.button_4 = tk.Button(master, text="4", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('4'))
-        self.button_5 = tk.Button(master, text="5", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('5'))
-        self.button_6 = tk.Button(master, text="6", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('6'))
-        self.button_7 = tk.Button(master, text="7", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('7'))
-        self.button_8 = tk.Button(master, text="8", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('8'))
-        self.button_9 = tk.Button(master, text="9", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('9'))
-        self.button_0 = tk.Button(master, text="0", width=5, height=2, font=('Arial', 14),
-                                  command=lambda: self.button_click('0'))
-
-        # Operatör tuşlarını oluşturma
-        self.button_add = tk.Button(master, text="+", width=5, height=2, font=('Arial', 14),
-                                    command=lambda: self.button_click('+'))
-        self.button_subtract = tk.Button(master, text="-", width=5, height=2, font=('Arial', 14),
-                                         command=lambda: self.button_click('-'))
-        self.button_multiply = tk.Button(master, text="*", width=5, height=2, font=('Arial', 14),
-                                         command=lambda: self.button_click('*'))
-        self.button_divide = tk.Button(master, text="/", width=5, height=2, font=('Arial', 14),
-                                       command=lambda: self.button_click('/'))
-        self.button_equal = tk.Button(master, text="=", width=5, height=2, font=('Arial', 14),
-                                      command=self.calculate)
-        self.button_clear = tk.Button(master, text="C", width=5, height=2, font=('Arial', 14),
-                                      command=self.clear)
-
-        # Tuşları düzenle
-                # Tuşları düzenleme
-        self.button_1.grid(row=3, column=0, padx=5, pady=5)
-        self.button_2.grid(row=3, column=1, padx=5, pady=5)
-        self.button_3.grid(row=3, column=2, padx=5, pady=5)
-        self.button_4.grid(row=2, column=0, padx=5, pady=5)
-        self.button_5.grid(row=2, column=1, padx=5, pady=5)
-        self.button_6.grid(row=2, column=2, padx=5, pady=5)
-        self.button_7.grid(row=1, column=0, padx=5, pady=5)
-        self.button_8.grid(row=1, column=1, padx=5, pady=5)
-        self.button_9.grid(row=1, column=2, padx=5, pady=5)
-        self.button_0.grid(row=4, column=0, padx=5, pady=5)
-        self.button_add.grid(row=1, column=3, padx=5, pady=5)
-        self.button_subtract.grid(row=2, column=3, padx=5, pady=5)
-        self.button_multiply.grid(row=3, column=3, padx=5, pady=5)
-        self.button_divide.grid(row=4, column=3, padx=5, pady=5)
-        self.button_equal.grid(row=4, column=2, padx=5, pady=5)
-        self.button_clear.grid(row=4, column=1, padx=5, pady=5)
-
-    def button_click(self, number):
-        current = self.display.get()
-        self.display.delete(0, tk.END)
-        self.display.insert(0, str(current) + str(number))
-
-    def clear(self):
-        self.display.delete(0, tk.END)
-
-    def calculate(self):
-        result = eval(self.display.get())
-        self.display.delete(0, tk.END)
-        self.display.insert(0, result)
-
-
-root = tk.Tk()
-root.attributes("-fullscreen", True)
-
-# Navigasyon çubuğunu gizle
-root.overrideredirect(True)
-root.configure(background="purple")
-root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
-
-
-
-calculator = Calculator(root)
-root.mainloop()
-
+App(tk.Tk(), "Hesap Makinesi ve Kamera Uygulaması")
