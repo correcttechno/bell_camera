@@ -3,7 +3,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 class VideoCapture:
-    def __init__(self, video_source=0):
+    def __init__(self, video_source=1):
         self.cap = cv2.VideoCapture(video_source)
         if not self.cap.isOpened():
             raise ValueError("Unable to open video source", video_source)
