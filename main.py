@@ -1,5 +1,6 @@
 import tkinter as tk
 import cv2
+from PIL import Image, ImageTk
 
 class App:
     def __init__(self, window, window_title):
@@ -57,7 +58,7 @@ class App:
         ret, frame = self.video.read()
         if ret:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            self.photo = tk.PhotoImage(image=tk.BitmapImage(data=frame))
+            self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
             self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.window.after(self.delay, self.update)
 
