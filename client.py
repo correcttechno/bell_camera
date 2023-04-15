@@ -86,5 +86,5 @@ def startSound():
 cameraClient= threading.Thread(target=startCamera)
 cameraClient.start()
 
-soundClient= threading.Thread(target=startSound)
-soundClient.start()
+""" soundClient= threading.Thread(target=startSound)
+soundClient.start() """
