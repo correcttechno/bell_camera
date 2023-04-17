@@ -179,7 +179,7 @@ root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenhe
 
 #root.after(10, show_frame)
 
-
+""" 
 #setting title
 root.title("MSB Distant Door Bell")
 #setting window size
@@ -190,5 +190,5 @@ screenheight = root.winfo_screenheight()
 alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
 root.geometry(alignstr)
 root.resizable(width=False, height=False)
-
+ """
 root.mainloop()
