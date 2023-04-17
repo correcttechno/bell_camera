@@ -5,7 +5,7 @@ import cv2
 from PIL import Image, ImageTk
 
 
-cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture(0)
 root = tk.Tk()
 
 
@@ -190,8 +190,8 @@ def updateCam():
         # Tkinter penceresini yenileme
         root.update()
 
-cameraCam= threading.Thread(target=updateCam)
-cameraCam.start()
+#cameraCam= threading.Thread(target=updateCam)
+#cameraCam.start()
 
 
 #root.attributes("-fullscreen", True)
