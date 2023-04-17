@@ -1,3 +1,5 @@
+
+import client
 import threading
 import tkinter as tk
 import tkinter.font as tkFont
@@ -5,10 +7,9 @@ import cv2
 from PIL import Image, ImageTk
 
 
-cap = cv2.VideoCapture(0)
 root = tk.Tk()
 
-bg_image = tk.PhotoImage(file="/home/msb/bell_camera/backgroundimage.png")
+bg_image = tk.PhotoImage(file="backgroundimage.png")#"/home/msb/bell_camera/backgroundimage.png")
 bg_label = tk.Label(root, image=bg_image)
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -175,19 +176,20 @@ def ButtonClick(number):
 def updateCam():
     while True:
         # Kamera görüntüsünü alma
-        ret, frame = cap.read()
-        frame=cv2.resize(frame,(500,400))
-        # OpenCV görüntüsünü Tkinter için uygun formata dönüştürme
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
-        img_tk = ImageTk.PhotoImage(image=img)
-        
+        frame=client.readCameraFrame()
+        if frame is not None:
+            frame=cv2.resize(frame,(500,400))
+            # OpenCV görüntüsünü Tkinter için uygun formata dönüştürme
+            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(img)
+            img_tk = ImageTk.PhotoImage(image=img)
+            
 
-        # Canvas'a görüntüyü ekleme
-        canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+            # Canvas'a görüntüyü ekleme
+            canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
 
-        # Tkinter penceresini yenileme
-        root.update()
+            # Tkinter penceresini yenileme
+            root.update()
 
 cameraCam= threading.Thread(target=updateCam)
 cameraCam.start()

@@ -23,7 +23,7 @@ import socketserver
 
 #HOST = '192.168.0.108'
 HOST = '162.214.48.246'
-CAMERAPORT = 8097
+CAMERAPORT = 8095
 SOUNDPORT=8094
 
 CHUNK_SIZE = 128
@@ -65,6 +65,8 @@ def startCameraBind(index):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+
+
 def startCamera( index):
     data = b""
     payload_size = struct.calcsize(">L")
@@ -99,7 +101,6 @@ def startCamera( index):
             try:
                 if len(cameraCLIENTS)>=2:
                     print("Video Sended")
-                    
                     mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
                     cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
             except :
