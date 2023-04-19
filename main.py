@@ -5,7 +5,6 @@ import tkinter as tk
 import tkinter.font as tkFont
 import cv2
 from PIL import Image, ImageTk
-
 from faceid import readFaceidFrame
 
 
