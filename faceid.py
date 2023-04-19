@@ -13,7 +13,7 @@ known_faces = []
 known_names = []
 
 # tanınan yüzlerin kaydedileceği dosya yolu
-known_faces_dir = 'known_faces'
+known_faces_dir = '/home/msb/bell_camera/known_faces'
 
 # tanınan yüzlerin dosya uzantısı
 file_extension = '.jpg'
@@ -84,9 +84,9 @@ def faceIdCallback():
                 cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 1)
 
                 # yüz ismini dikdörtgenin üstüne yaz
-                cv2.rectangle(frame, (left, bottom - 20), (right, bottom), (0, 255, 0), cv2.FILLED)
-                font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
+                #cv2.rectangle(frame, (left, bottom - 20), (right, bottom), (0, 255, 0), cv2.FILLED)
+                #font = cv2.FONT_HERSHEY_DUPLEX
+                #cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
 
 
         # kareyi ekranda göster
