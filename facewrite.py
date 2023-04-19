@@ -1,80 +1,93 @@
+import time
 import cv2
+import face_recognition
 import os
-import numpy as np
-import dlib
 
-# yüz tanıma modeli yükleme
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+# tanınan yüzlerin özellikleri
+known_faces = []
 
-# yüz tanıma modeli için özellik çıkarımını yapacak fonksiyon
-def extract_face_features(image, detector, predictor):
-    # görüntüyü gri tonlamalı hale getir
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # yüzleri algıla
-    faces = detector(gray)
-    
-    # yüz hatlarını çıkar
-    face_features = None
-    for face in faces:
-        landmarks = predictor(gray, face)
-        face_features = np.array([[point.x, point.y] for point in landmarks.parts()])
-    
-    return face_features
+# tanınan yüzlerin isimleri
+known_names = []
 
-# kayıt yapılacak yüz sayısı
-num_of_samples = 10
+# tanınan yüzlerin kaydedileceği dosya yolu
+known_faces_dir = 'known_faces'
 
-# kayıt yapılacak kullanıcının adı
-user_name = "Ruslan"
-# kayıt için görüntüleri al
+# tanınan yüzlerin dosya uzantısı
+file_extension = '.jpg'
+
+# önceden kaydedilmiş yüzleri oku
+for filename in os.listdir(known_faces_dir):
+    name = os.path.splitext(filename)[0]
+    known_names.append(name)
+
+    file_path = os.path.join(known_faces_dir, filename)
+    image = face_recognition.load_image_file(file_path)
+    face_encoding = face_recognition.face_encodings(image)[0]
+    known_faces.append(face_encoding)
+
+# canlı video akışı yakalayıcısı
 cap = cv2.VideoCapture(0)
 
-# kullanıcının yüzünü kaydetmek için kullanılacak dizi
+while True:
+    # video akışından bir kare al
+    ret, frame = cap.read()
+    
+    # kareyi yüzleri tanımak için işle
+    face_locations = face_recognition.face_locations(frame)
+    face_encodings = face_recognition.face_encodings(frame, face_locations)
+
+    # yüzleri tanımla ve kaydet
+    for face_encoding, face_location in zip(face_encodings, face_locations):
+        # yüz tanıma işlemi
+        matches = face_recognition.compare_faces(known_faces, face_encoding)
+
+        # yüzü tanımak için kullanılan en iyi eşleşmenin dizini
+        best_match_index = -1
+        best_match_distance = 1.0
+
+        for i in range(len(matches)):
+            if matches[i]:
+                face_distance = face_recognition.face_distance([known_faces[i]], face_encoding)[0]
+                if face_distance < best_match_distance:
+                    best_match_index = i
+                    best_match_distance = face_distance
+
+        # yüzü kaydetmek için eğer tanınmadıysa
+        if best_match_index == -1:
+            # yüzü tanımlamak için bir isim girdisi al
+            name = input("Yeni bir yüz tanımlandı, lütfen ismini girin: ")
+
+            # yüzü kaydet
+            known_faces.append(face_encoding)
+            known_names.append(name)
+
+            # yüzü dosya olarak kaydet
+            file_path = os.path.join(known_faces_dir, name + file_extension)
+            cv2.imwrite(file_path, frame)
+
+            print(f"{name} isimli yüz kaydedildi.")
+
+        # yüz daha önce kaydedilmişse dosya ismini yazdır
+        else:
+            name = known_names[best_match_index]
+            print(f"{name} isimli yüz tanındı.")
+
+            top, right, bottom, left = face_location
+            cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 1)
+
+            # yüz ismini dikdörtgenin üstüne yaz
+            cv2.rectangle(frame, (left, bottom - 20), (right, bottom), (0, 255, 0), cv2.FILLED)
+            font = cv2.FONT_HERSHEY_DUPLEX
+            cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
 
 
+    # kareyi ekranda göster
+    cv2.imshow('Video', frame)
 
+    # q tuşuna basarak çıkış yap
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-threshold = 0.6
-
-if True:
-    user_face_features =[]
-   # np.load("data.npy".format(user_name))
-
-    for i in range(num_of_samples):
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        # kullanıcının yüz özelliklerini çıkar
-        face_features = extract_face_features(frame, detector, predictor)
-        
-        
-        if face_features is not None:
-            user_face_features.append(face_features)
-            # kullanıcının yüzüne çerçeve ekle
-            x1, y1 = np.min(face_features, axis=0)
-            x2, y2 = np.max(face_features, axis=0)
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 1)
-
-                # kaydedilen yüz sayısını göster
-            cv2.putText(frame, "Sample {}".format(i+1), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            cv2.imshow("Kayit Yuzu", frame)
-
-        # 'q' tuşuna basıldığında çık
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-
-
-    # yüz özelliklerini veritabanına kaydet
-    if len(user_face_features) == num_of_samples:
-        np.save("data.npy".format(user_name), np.array(user_face_features))
-        print("Yuz kaydi basariyla kaydedildi!")
-    else:
-        print("Yuz kaydi yapilamadi!")
-
-
+# kaynakları serbest bırak
 cap.release()
 cv2.destroyAllWindows()

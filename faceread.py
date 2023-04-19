@@ -27,6 +27,7 @@ def extract_face_features(image, detector, predictor):
 user_name = "Ruslan"
 user_face_features = np.load("data.npy".format(user_name))
 
+
 # eşleşme için belirlenen threshold değeri
 threshold = 0.6
 
@@ -44,11 +45,13 @@ while True:
     # yüz özelliklerini kaydedilen yüz verileriyle karşılaştır
     if face_features is not None:
         match_scores = []
-        for user_face_feature in user_face_features:
+        #for user_face_feature in user_face_features:
             # öklid uzaklığı hesapla
-            dist = np.linalg.norm(user_face_feature - face_features)
-            match_scores.append(dist)
+        dist = np.linalg.norm(user_face_features - face_features)
+        match_scores.append(dist)
 
+
+       
         # eşleşme oranını kontrol et
         if np.min(match_scores) < threshold:
             # eşleşme olduğunda mesaj yazdır
