@@ -6,6 +6,8 @@ import tkinter.font as tkFont
 import cv2
 from PIL import Image, ImageTk
 
+from faceid import readFaceidFrame
+
 
 root = tk.Tk()
 
@@ -176,7 +178,7 @@ def ButtonClick(number):
 def updateCam():
     while True:
         # Kamera görüntüsünü alma
-        frame=client.readCameraFrame()
+        frame=readFaceidFrame()
         if frame is not None:
             frame=cv2.resize(frame,(500,400))
             # OpenCV görüntüsünü Tkinter için uygun formata dönüştürme

@@ -9,6 +9,8 @@ import imutils
 import pyaudio
 import threading
 
+from camera import readCameraFrame
+
 
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
 #HOST = '192.168.0.108'
@@ -34,38 +36,22 @@ try:
 except:
     print("Error sound socket")
 
-cam = cv2.VideoCapture(0)
-cam.set(cv2.CAP_PROP_FPS, 24)
-
 
 #encode to jpeg format
 #encode param image quality 0 to 100. default:95
 #if you want to shrink data size, choose low image quality.
 
 
-cleanFrame=None
 
-def cameraCallback():
-    global cleanFrame
-    while True:
-        ret,frame= cam.read()
-        cleanFrame=frame
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cam.release()
-
-def readCameraFrame():
-    global cleanFrame
-    return cleanFrame
 
 
 
 def cameraClient():
-    global cleanFrame
     img_counter = 0
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),60]
     try:
         while True:
+            cleanFrame=readCameraFrame()
             if cleanFrame is not None:
                 frame=cleanFrame
                 frame = imutils.resize(frame, width=320,height=240)
@@ -83,7 +69,7 @@ def cameraClient():
                 img_counter += 1
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-    except(ex):
+    except:
         print("Error camera socket")
     
 
@@ -113,7 +99,7 @@ def soundClient():
 
 
 threading.Thread(target=cameraClient).start()
-threading.Thread(target=cameraCallback).start()
+
 
 
 """threading.Thread(target=startSound).start()
