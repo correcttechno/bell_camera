@@ -37,9 +37,9 @@ except:
 
 
 try:
-    soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   """  soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soundSocket.connect((HOST, SOUNDPORT))
-    soundSocket.send("DOORBELL".encode('utf-8'))
+    soundSocket.send("DOORBELL".encode('utf-8')) """
 except:
     print("Error sound socket")
 
@@ -95,7 +95,7 @@ def soundClient():
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
         if len(sounddata)>0:
-            soundSocket.sendall(sounddata)
+            #soundSocket.sendall(sounddata)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         
@@ -106,7 +106,4 @@ def soundClient():
 
 
 threading.Thread(target=cameraClient).start()
-
-
-
 threading.Thread(target=soundClient).start()
