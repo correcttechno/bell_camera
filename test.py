@@ -12,7 +12,7 @@ stream_in = p.open(format=FORMAT,
                         rate=RATE,
                         input=True,
                         frames_per_buffer=CHUNK_SIZE,
-                        input_device_index=2
+                        input_device_index=None
                         )
 
 
