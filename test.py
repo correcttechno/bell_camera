@@ -3,7 +3,7 @@ import cv2
 CHUNK_SIZE = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 44100
+RATE = 48000
 
 
 p = pyaudio.PyAudio()
