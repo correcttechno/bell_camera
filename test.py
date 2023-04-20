@@ -22,10 +22,10 @@ print("Kaydediliyor...")
  
 frames = []
  
-for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+while True:
     data = stream.read(CHUNK)
     stream_out.write(data)
-    frames.append(data)
+    //frames.append(data)
  
 print("Kayit bitti.")
  
