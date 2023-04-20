@@ -18,7 +18,7 @@ stream_out = p.open(format=FORMAT,
                                channels=CHANNELS,
                                rate=RATE,
                                output=True,
-                               frames_per_buffer=CHUNK_SIZE
+                               frames_per_buffer=CHUNK_SIZE,
                                output_device_index=0
                                )
 while True:
