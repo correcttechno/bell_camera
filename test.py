@@ -17,6 +17,6 @@ stream_in = p.open(format=FORMAT,
 while True:
         sounddata = stream_in.read(CHUNK_SIZE)
         if len(sounddata)>0:
-             print("Data oxuyur"))
+             print("Data oxuyur")
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
