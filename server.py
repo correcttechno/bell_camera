@@ -50,68 +50,83 @@ MYFR=[None,None]
 MData=None
 MData_Size=None
 
-cameraCLIENTS=[]
-soundCLIENTS=[]
+cameraSender=None
+cameraReciver=None
+
+soundSender=None
+soundReciver=None
 
 
 
 #kamera functions
 
 def startCameraBind(index):
+    global cameraSender
+    global cameraReciver
     while True:
         conn,addr=cs.accept()
         
-        cameraCLIENTS.append(conn)
+       
+        token = conn.recv(1024).decode("utf-8")
+        if(token=="DOORBELL"):
+            cameraSender=conn
+        else:
+            cameraReciver=conn
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
 
 
-def startCamera( index):
+def startCamera(index):
+    global cameraSender
+    global cameraReciver
     data = b""
     payload_size = struct.calcsize(">L")
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
-    img_counter = 0
+   
+    i=0
     while True:
-        if len(cameraCLIENTS)>=1:
-            while len(data) < payload_size:
-                data += cameraCLIENTS[0].recv(50*1024)
-                
-            # receive image row data form client socket
-            packed_msg_size = data[:payload_size]
-
-            data = data[payload_size:]
-        
-            msg_size = struct.unpack(">L", packed_msg_size)[0]
-            while len(data) < msg_size:
-                data += cameraCLIENTS[0].recv(50*1024)
-            frame_data = data[:msg_size]
-            data = data[msg_size:]
-            # unpack image using pickle 
-            
-            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
-            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-            
-
-            frame = imutils.resize(frame, width=320)
-            # 鏡像
-            frame = cv2.flip(frame,180)
-            result, image = cv2.imencode('.jpg', frame, encode_param)
-            MYFR[0]=image
+        i=i+1
+        if cameraSender is not None:
             try:
-                if len(cameraCLIENTS)>=2:
-                    print("Video Sended")
+                while len(data) < payload_size:
+                    data += cameraSender.recv(50*1024)
+                    
+                # receive image row data form client socket
+                packed_msg_size = data[:payload_size]
+
+                data = data[payload_size:]
+            
+                msg_size = struct.unpack(">L", packed_msg_size)[0]
+                while len(data) < msg_size:
+                    data += cameraSender.recv(50*1024)
+                frame_data = data[:msg_size]
+                data = data[msg_size:]
+                # unpack image using pickle 
+                
+                frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+                frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+                
+
+                frame = imutils.resize(frame, width=320)
+                # 鏡像
+                frame = cv2.flip(frame,180)
+                result, image = cv2.imencode('.jpg', frame, encode_param)
+                MYFR[0]=image
+            
+                if cameraReciver is not None:
+                    #print("Video Sended")
                     mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
-                    cameraCLIENTS[len(cameraCLIENTS)-1].sendall(mydata)
+                    cameraReciver.sendall(mydata)
             except :
-                print("close camera socket")
+                print("close camera socket",i)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
                        
+
 threading.Thread(target=startCamera,args={0}).start()
-
-
 
 
 """ 
@@ -126,35 +141,43 @@ stream_out = p.open(format=FORMAT,
 
 
 def startSoundBind(index):
+    global soundSender
+    global soundReciver
     while True:
         conn,addr=ss.accept()
-        soundCLIENTS.append(conn)
+        token = conn.recv(1024).decode("utf-8")
+        if(token=="DOORBELL"):
+            soundSender=conn
+            
+        else:
+            soundReciver=conn
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
        
 def startSound(index):
-    
+    global soundSender
+    global soundReciver
 
     while True:
-        if len(soundCLIENTS)>=1:
+        if soundSender is not None:
             #print("ISMEL BASLADI")
                     # İstemciden gelen veriyi al
-            sounddata = soundCLIENTS[0].recv(CHUNK_SIZE)
+            sounddata = soundSender.recv(CHUNK_SIZE)
             
             #stream_out.write(sounddata)
             try:
-                if len(soundCLIENTS)>=2:
-                    print("Sound Sended")
-                    soundCLIENTS[len(soundCLIENTS)-1].sendall(sounddata)   
+                if soundReciver is not None:
+                    #print("Sound Sended")
+                    soundSender.sendall(sounddata)   
             except:
                 print("close sound socket")
                      
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
             
+
 threading.Thread(target=startSound,args={0}).start()
-
-
 
 
 

@@ -13,7 +13,7 @@ known_faces = []
 known_names = []
 
 # tanınan yüzlerin kaydedileceği dosya yolu
-known_faces_dir = '/home/msb/bell_camera/known_faces'
+known_faces_dir = 'known_faces'
 
 # tanınan yüzlerin dosya uzantısı
 file_extension = '.jpg'
@@ -70,7 +70,7 @@ def faceIdCallback():
                 #file_path = os.path.join(known_faces_dir, name + file_extension)
                 #cv2.imwrite(file_path, frame)
 
-                print(f"Tanimadi")
+                
 
                 top, right, bottom, left = face_location
                 cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 1)
