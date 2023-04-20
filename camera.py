@@ -9,7 +9,7 @@ def cameraCallback():
     global cleanFrame
     while True:
         ret,frame= cam.read()
-        
+        frame=cv2.resize(frame,(640,480))
         cleanFrame=frame
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
