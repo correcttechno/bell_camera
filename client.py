@@ -77,6 +77,7 @@ def cameraClient():
 
 
 def soundClient():
+    
     p = pyaudio.PyAudio()
     stream_in = p.open(format=FORMAT,
                         channels=CHANNELS,
@@ -85,12 +86,15 @@ def soundClient():
                         frames_per_buffer=CHUNK_SIZE,
                         input_device_index=-2
                         )
-    while True:
-        sounddata = stream_in.read(CHUNK_SIZE)
-        if len(sounddata)>0:
-            soundSocket.sendall(sounddata)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    try:
+        while True:
+            sounddata = stream_in.read(CHUNK_SIZE)
+            if len(sounddata)>0:
+                soundSocket.sendall(sounddata)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    except:
+        print("Sound Error")
         
 
 
