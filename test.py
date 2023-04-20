@@ -1,19 +1,17 @@
-import pyaudio
-import cv2
-CHUNK_SIZE = 1024
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 44100
+import alsaaudio
+import numpy as np
 
+# Set up audio input
+inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE, alsaaudio.PCM_NORMAL)
+inp.setchannels(1)
+inp.setrate(44100)
+inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+inp.setperiodsize(1024)
 
-p = pyaudio.PyAudio()
-stream_in = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK_SIZE,
-                        input_device_index=None
-                        )
-
-
-sounddata = stream_in.read(CHUNK_SIZE)
+while True:
+    # Read data from audio input
+    length, data = inp.read()
+    # Convert data to numpy array
+    data = np.frombuffer(data, dtype=np.int16)
+    # Process data as needed
+    print(data)
