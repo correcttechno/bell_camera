@@ -9,11 +9,6 @@ import imutils
 import pyaudio
 import threading
 
-import os
-os.environ['ALSA_CONFIG_PATH'] = '/home/msb/.asoundrc'
-
-
-
 from camera import readCameraFrame
 
 
@@ -31,15 +26,13 @@ RATE = 44100
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cameraSocket.connect((HOST, CAMERAPORT))
-    cameraSocket.sendall("DOORBELL".encode('utf-8'))
 except:
     print("Error camera socket")
 
 
 try:
-   """  soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soundSocket.connect((HOST, SOUNDPORT))
-    soundSocket.send("DOORBELL".encode('utf-8')) """
 except:
     print("Error sound socket")
 
@@ -90,13 +83,12 @@ def soundClient():
                         rate=RATE,
                         input=True,
                         frames_per_buffer=CHUNK_SIZE,
-                        input_device_index=0
+                        input_device_index=1
                         )
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
         if len(sounddata)>0:
-            print("Gonderildi sound")
-            #soundSocket.sendall(sounddata)
+            soundSocket.sendall(sounddata)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         
@@ -107,4 +99,7 @@ def soundClient():
 
 
 threading.Thread(target=cameraClient).start()
-threading.Thread(target=soundClient).start()
+
+
+
+threading.Thread(target=startSound).start()
