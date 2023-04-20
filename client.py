@@ -78,14 +78,14 @@ def cameraClient():
     
 
 
+audio = pyaudio.PyAudio()
 
-p = pyaudio.PyAudio()
 
-stream_in = p.open(format=FORMAT, channels=CHANNELS,
+stream_in = audio.open(format=FORMAT, channels=CHANNELS,
                 rate=RATE, input=True,
                 frames_per_buffer=CHUNK_SIZE)
     
-stream_out = p.open(format=FORMAT, channels=CHANNELS,
+stream_out = audio.open(format=FORMAT, channels=CHANNELS,
                 rate=RATE,output=True,
                 frames_per_buffer=CHUNK_SIZE)
 
@@ -107,7 +107,5 @@ def soundClient():
 
 
 threading.Thread(target=cameraClient).start()
-
-
 
 threading.Thread(target=soundClient).start()
