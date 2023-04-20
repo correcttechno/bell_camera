@@ -1,19 +1,38 @@
 import pyaudio
-import cv2
-CHUNK_SIZE = 1024
+import wave
+ 
+# Ses özellikleri
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
-
-
-p = pyaudio.PyAudio()
-stream_in = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK_SIZE,
-                        input_device_index=1
-                        )
-
-
-sounddata = stream_in.read(CHUNK_SIZE)
+CHUNK = 1024
+RECORD_SECONDS = 5
+WAVE_OUTPUT_FILENAME = "test.wav"
+ 
+audio = pyaudio.PyAudio()
+ 
+# Ses kaydedici
+stream = audio.open(format=FORMAT, channels=CHANNELS,
+                rate=RATE, input=True,
+                frames_per_buffer=CHUNK)
+print("Kaydediliyor...")
+ 
+frames = []
+ 
+for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+    data = stream.read(CHUNK)
+    frames.append(data)
+ 
+print("Kayit bitti.")
+ 
+stream.stop_stream()
+stream.close()
+audio.terminate()
+ 
+# Ses dosyasını kaydet
+waveFile = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+waveFile.setnchannels(CHANNELS)
+waveFile.setsampwidth(audio.get_sample_size(FORMAT))
+waveFile.setframerate(RATE)
+waveFile.writeframes(b''.join(frames))
+waveFile.close()
