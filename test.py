@@ -15,16 +15,12 @@ audio = pyaudio.PyAudio()
 stream = audio.open(format=FORMAT, channels=CHANNELS,
                 rate=RATE, input=True,
                 frames_per_buffer=CHUNK)
-stream_out = audio.open(format=FORMAT, channels=CHANNELS,
-                rate=RATE, output=True,
-                frames_per_buffer=CHUNK)
 print("Kaydediliyor...")
  
 frames = []
  
 for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
     data = stream.read(CHUNK)
-    stream_out.write(data)
     frames.append(data)
  
 print("Kayit bitti.")
