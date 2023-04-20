@@ -26,6 +26,7 @@ RATE = 44100
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cameraSocket.connect((HOST, CAMERAPORT))
+    cameraSocket.send("DOORBELL".encode('utf-8'))
 except:
     print("Error camera socket")
 
@@ -33,6 +34,7 @@ except:
 try:
     soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soundSocket.connect((HOST, SOUNDPORT))
+    soundSocket.send("DOORBELL".encode('utf-8'))
 except:
     print("Error sound socket")
 
