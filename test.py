@@ -1,24 +1,19 @@
-import alsaaudio
-import numpy as np
+import pyaudio
+import cv2
+CHUNK_SIZE = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
 
 
-card = 'sysdefault:CARD=2' # Örneğin: 'sysdefault:CARD=Device'
-device = 'hw:1,0'
-channels = 1
-format = alsaaudio.PCM_FORMAT_S16_LE
-rate = 44100
-
-inp = alsaaudio.PCM(device=device, card=card)
-inp.setchannels(channels)
-inp.setrate(rate)
-inp.setformat(format)
-inp.setperiodsize(1024)
+p = pyaudio.PyAudio()
+stream_in = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK_SIZE,
+                        input_device_index=1
+                        )
 
 
-while True:
-    # Read data from audio input
-    length, data = inp.read()
-    # Convert data to numpy array
-    data = np.frombuffer(data, dtype=np.int16)
-    # Process data as needed
-    print(data)
+sounddata = stream_in.read(CHUNK_SIZE)
