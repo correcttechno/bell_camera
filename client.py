@@ -21,7 +21,7 @@ SOUNDPORT=8094
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
-CHUNK_SIZE = 2048
+CHUNK_SIZE = 512
 
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
