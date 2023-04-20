@@ -89,7 +89,7 @@ stream_in = audio.open(format=FORMAT, channels=CHANNELS,
 def soundClient():
     
     while True:
-        sounddata = stream_in.read(CHUNK_SIZE)
+        sounddata = stream_in.read(2048)
      
         if len(sounddata)>0:
             soundSocket.sendall(sounddata)
