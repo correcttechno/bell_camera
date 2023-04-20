@@ -2,7 +2,7 @@ import alsaaudio
 import numpy as np
 
 
-card = 'sysdefault:CARD=Device [USB Audio Device]' # Örneğin: 'sysdefault:CARD=Device'
+card = 'sysdefault:CARD=2' # Örneğin: 'sysdefault:CARD=Device'
 device = alsaaudio.PCM_CAPTURE
 channels = 1
 format = alsaaudio.PCM_FORMAT_S16_LE
