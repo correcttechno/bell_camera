@@ -1,4 +1,5 @@
 
+from camera import readCameraFrame
 import client
 import threading
 import tkinter as tk
@@ -177,7 +178,7 @@ def ButtonClick(number):
 def updateCam():
     while True:
         # Kamera görüntüsünü alma
-        frame=readFaceidFrame()
+        frame=readCameraFrame()
         if frame is not None:
             frame=cv2.resize(frame,(500,400))
             # OpenCV görüntüsünü Tkinter için uygun formata dönüştürme
