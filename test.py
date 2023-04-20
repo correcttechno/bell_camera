@@ -1,5 +1,5 @@
 import pyaudio
-
+import cv2
 CHUNK_SIZE = 128
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -14,4 +14,9 @@ stream_in = p.open(format=FORMAT,
                         frames_per_buffer=CHUNK_SIZE,
                         input_device_index=1
                         )
-    
+while True:
+        sounddata = stream_in.read(CHUNK_SIZE)
+        if len(sounddata)>0:
+             print("Data oxuyur"))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
