@@ -14,9 +14,13 @@ stream_in = p.open(format=FORMAT,
                         frames_per_buffer=CHUNK_SIZE,
                         input_device_index=-2
                         )
+stream_out = p.open(format=FORMAT,
+                               channels=CHANNELS,
+                               rate=RATE,
+                               output=True,
+                               frames_per_buffer=CHUNK_SIZE)
 while True:
         sounddata = stream_in.read(CHUNK_SIZE)
-        if len(sounddata)>0:
-             print("Data oxuyur")
+        stream_out.write(sounddata)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
