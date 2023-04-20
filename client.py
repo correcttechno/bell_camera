@@ -102,4 +102,4 @@ threading.Thread(target=cameraClient).start()
 
 
 
-threading.Thread(target=startSound).start()
+threading.Thread(target=soundClient).start()
