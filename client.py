@@ -10,7 +10,7 @@ import pyaudio
 import threading
 
 import os
-os.environ['ALSA_CONFIG_PATH'] = '/path/to/.asoundrc'
+os.environ['ALSA_CONFIG_PATH'] = '/usr/share/alsa/alsa.conf'
 
 
 from camera import readCameraFrame
