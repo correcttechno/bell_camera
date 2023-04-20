@@ -97,7 +97,7 @@ def soundClient():
                     frames_per_buffer=CHUNK_SIZE)
 
     while True:
-        sounddata = stream_in.read(1024)
+        sounddata = stream_in.read(CHUNK_SIZE)
         stream_out.write(sounddata)
         """ if len(sounddata)>0:
             soundSocket.sendall(sounddata) """
