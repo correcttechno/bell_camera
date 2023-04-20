@@ -21,7 +21,7 @@ SOUNDPORT=8094
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
-CHUNK_SIZE = 1024
+CHUNK_SIZE = 512
 
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -93,6 +93,7 @@ def soundClient():
      
         if len(sounddata)>0:
             soundSocket.sendall(sounddata)
+           
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
    
