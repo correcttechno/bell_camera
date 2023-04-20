@@ -18,10 +18,7 @@ HOST = '162.214.48.246'
 CAMERAPORT = 8095
 SOUNDPORT=8094
 
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 48000
-CHUNK_SIZE = 1024
+
 
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,6 +46,7 @@ except:
 
 
 def cameraClient():
+    
     img_counter = 0
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),60]
     try:
@@ -78,19 +76,26 @@ def cameraClient():
     
 
 
-audio = pyaudio.PyAudio()
 
-
-stream_in = audio.open(format=FORMAT, channels=CHANNELS,
-                rate=RATE, input=True,
-                frames_per_buffer=CHUNK_SIZE)
-    
-stream_out = audio.open(format=FORMAT, channels=CHANNELS,
-                rate=RATE,output=True,
-                frames_per_buffer=CHUNK_SIZE)
 
 def soundClient():
     
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 48000
+    CHUNK_SIZE = 1024
+
+    audio = pyaudio.PyAudio()
+
+
+    stream_in = audio.open(format=FORMAT, channels=CHANNELS,
+                    rate=RATE, input=True,
+                    frames_per_buffer=CHUNK_SIZE)
+        
+    stream_out = audio.open(format=FORMAT, channels=CHANNELS,
+                    rate=RATE,output=True,
+                    frames_per_buffer=CHUNK_SIZE)
+
     while True:
         sounddata = stream_in.read(1024)
         stream_out.write(sounddata)
