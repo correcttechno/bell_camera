@@ -89,8 +89,7 @@ def soundClient():
                         channels=CHANNELS,
                         rate=RATE,
                         input=True,
-                        frames_per_buffer=CHUNK_SIZE,
-                        input_device_index=0
+                        frames_per_buffer=CHUNK_SIZE
                         )
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
