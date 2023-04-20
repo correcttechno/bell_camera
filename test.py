@@ -12,14 +12,14 @@ stream_in = p.open(format=FORMAT,
                         rate=RATE,
                         input=True,
                         frames_per_buffer=CHUNK_SIZE,
-                        input_device_index=0
+                        input_device_index=2
                         )
 stream_out = p.open(format=FORMAT,
                                channels=CHANNELS,
                                rate=RATE,
                                output=True,
                                frames_per_buffer=CHUNK_SIZE,
-                               output_device_index=0
+                               output_device_index=2
                                )
 while True:
         sounddata = stream_in.read(CHUNK_SIZE)
