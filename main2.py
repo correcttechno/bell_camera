@@ -10,7 +10,7 @@ from faceid import readFaceidFrame
 
 root = tk.Tk()
 
-bg_image = tk.PhotoImage(file="backgroundimage.png")#"/home/msb/bell_camera/backgroundimage.png")
+bg_image = tk.PhotoImage(file="/home/msb/bell_camera/backgroundimage.png")#"/home/msb/bell_camera/backgroundimage.png")
 bg_label = tk.Label(root, image=bg_image)
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
