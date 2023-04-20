@@ -1,7 +1,7 @@
 import threading
 import cv2
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
 
 cleanFrame=None
 
