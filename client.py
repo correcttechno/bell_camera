@@ -78,17 +78,19 @@ def cameraClient():
     
 
 
-def soundClient():
-    
-    p = pyaudio.PyAudio()
-    stream_in = p.open(format=FORMAT, channels=CHANNELS,
+
+p = pyaudio.PyAudio()
+
+stream_in = p.open(format=FORMAT, channels=CHANNELS,
                 rate=RATE, input=True,
                 frames_per_buffer=CHUNK_SIZE)
     
-    stream_out = p.open(format=FORMAT, channels=CHANNELS,
+stream_out = p.open(format=FORMAT, channels=CHANNELS,
                 rate=RATE,output=True,
                 frames_per_buffer=CHUNK_SIZE)
-  
+
+def soundClient():
+    
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
         stream_out.write(sounddata)
