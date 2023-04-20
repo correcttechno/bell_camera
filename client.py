@@ -21,7 +21,7 @@ SOUNDPORT=8094
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
-CHUNK_SIZE = 4096
+CHUNK_SIZE = 1024
 
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,7 +89,7 @@ stream_in = audio.open(format=FORMAT, channels=CHANNELS,
 def soundClient():
     
     while True:
-        sounddata = stream_in.read(CHUNK_SIZE)
+        sounddata = stream_in.read(CHUNK_SIZE,exception_on_overflow=False)
      
         if len(sounddata)>0:
             soundSocket.sendall(sounddata)
