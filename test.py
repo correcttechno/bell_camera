@@ -3,7 +3,7 @@ import numpy as np
 
 
 card = 'sysdefault:CARD=2' # Örneğin: 'sysdefault:CARD=Device'
-device = alsaaudio.PCM_CAPTURE
+device = 'hw:1,0'
 channels = 1
 format = alsaaudio.PCM_FORMAT_S16_LE
 rate = 44100
