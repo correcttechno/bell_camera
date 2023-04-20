@@ -1,12 +1,19 @@
 import alsaaudio
 import numpy as np
 
-# Set up audio input
-inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE, alsaaudio.PCM_NORMAL)
-inp.setchannels(1)
-inp.setrate(44100)
-inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+
+card = 'sysdefault:CARD=Device [USB Audio Device]' # Örneğin: 'sysdefault:CARD=Device'
+device = alsaaudio.PCM_CAPTURE
+channels = 1
+format = alsaaudio.PCM_FORMAT_S16_LE
+rate = 44100
+
+inp = alsaaudio.PCM(device=device, card=card)
+inp.setchannels(channels)
+inp.setrate(rate)
+inp.setformat(format)
 inp.setperiodsize(1024)
+
 
 while True:
     # Read data from audio input
