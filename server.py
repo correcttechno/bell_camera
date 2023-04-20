@@ -13,6 +13,7 @@ import zlib
 import imutils
 from PIL import Image, ImageOps
 import asyncio
+import pyaudio
 import websockets
 import mediapipe as mp
 #import pyaudio
@@ -21,13 +22,13 @@ import socketserver
 #from pydub import AudioSegment
 
 
-#HOST = '192.168.0.108'
-HOST = '162.214.48.246'
+HOST = '192.168.0.108'
+#HOST = '162.214.48.246'
 CAMERAPORT = 8095
 SOUNDPORT=8094
 
 CHUNK_SIZE = 1024
-#FORMAT = pyaudio.paInt16
+FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 SAMPLE_RATE = 44100
@@ -129,7 +130,7 @@ def startCamera(index):
 threading.Thread(target=startCamera,args={0}).start()
 
 
-""" 
+
 
 p = pyaudio.PyAudio()
 stream_out = p.open(format=FORMAT,
@@ -137,7 +138,7 @@ stream_out = p.open(format=FORMAT,
                                rate=RATE,
                                output=True,
                                frames_per_buffer=CHUNK_SIZE)
- """
+
 
 
 def startSoundBind(index):
@@ -165,7 +166,7 @@ def startSound(index):
                     # İstemciden gelen veriyi al
             sounddata = soundSender.recv(CHUNK_SIZE)
             
-            #stream_out.write(sounddata)
+            stream_out.write(sounddata)
             try:
                 if soundReciver is not None:
                     #print("Sound Sended")
