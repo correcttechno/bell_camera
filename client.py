@@ -95,6 +95,7 @@ def soundClient():
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
         if len(sounddata)>0:
+            print("Gonderildi sound")
             #soundSocket.sendall(sounddata)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
