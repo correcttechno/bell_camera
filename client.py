@@ -92,8 +92,8 @@ def soundClient():
     while True:
         sounddata = stream_in.read(CHUNK_SIZE)
         stream_out.write(sounddata)
-        if len(sounddata)>0:
-            soundSocket.sendall(sounddata)
+        """ if len(sounddata)>0:
+            soundSocket.sendall(sounddata) """
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
    
