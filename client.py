@@ -92,7 +92,7 @@ stream_out = audio.open(format=FORMAT, channels=CHANNELS,
 def soundClient():
     
     while True:
-        sounddata = stream_in.read(CHUNK_SIZE)
+        sounddata = stream_in.read(1024)
         stream_out.write(sounddata)
         """ if len(sounddata)>0:
             soundSocket.sendall(sounddata) """
@@ -108,5 +108,4 @@ def soundClient():
 
 threading.Thread(target=cameraClient).start()
 
-#threading.Thread(target=).start()
-soundClient()
+threading.Thread(target=soundClient).start()
