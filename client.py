@@ -84,9 +84,14 @@ def soundClient():
     stream_in = p.open(format=FORMAT, channels=CHANNELS,
                 rate=RATE, input=True,
                 frames_per_buffer=CHUNK_SIZE)
+    
+    stream_out = p.open(format=FORMAT, channels=CHANNELS,
+                rate=RATE,output=True,
+                frames_per_buffer=CHUNK_SIZE)
     try:
         while True:
             sounddata = stream_in.read(CHUNK_SIZE)
+            stream_out.write(sounddata)
             if len(sounddata)>0:
                 soundSocket.sendall(sounddata)
             if cv2.waitKey(1) & 0xFF == ord('q'):
