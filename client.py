@@ -106,5 +106,5 @@ def soundClient():
 
 threading.Thread(target=cameraClient).start()
 
-#threading.Thread(target=soundClient).start()
-soundClient()
+threading.Thread(target=soundClient).start()
+#soundClient()
