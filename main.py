@@ -11,6 +11,9 @@ from splash import splash
 
 
 root = tk.Tk()
+splash()
+
+
 
 """ bg_image = tk.PhotoImage(file="home/msb/bell_camera/backgroundimage.png")#"/home/msb/bell_camera/backgroundimage.png")
 bg_label = tk.Label(root, image=bg_image)
@@ -222,6 +225,6 @@ root.geometry(alignstr)
 root.resizable(width=False, height=False)
 
 
-splash()
+
 
 root.mainloop()
