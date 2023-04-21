@@ -7,6 +7,7 @@ import tkinter.font as tkFont
 import cv2
 from PIL import Image, ImageTk
 from faceid import readFaceidFrame
+from splash import splash
 
 
 root = tk.Tk()
@@ -219,5 +220,8 @@ screenheight = root.winfo_screenheight()
 alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
 root.geometry(alignstr)
 root.resizable(width=False, height=False)
+
+
+splash()
 
 root.mainloop()
