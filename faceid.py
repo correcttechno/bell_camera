@@ -13,7 +13,7 @@ known_faces = []
 known_names = []
 
 # tanınan yüzlerin kaydedileceği dosya yolu
-known_faces_dir = '/home/msb/bell_camera/known_faces'
+known_faces_dir = './known_faces'
 
 # tanınan yüzlerin dosya uzantısı
 file_extension = '.jpg'
