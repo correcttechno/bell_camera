@@ -14,7 +14,7 @@ import imutils
 from PIL import Image, ImageOps
 import asyncio
 import websockets
-import mediapipe as mp
+#import mediapipe as mp
 #import pyaudio
 from http import server
 import socketserver
