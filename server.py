@@ -22,7 +22,7 @@ import socketserver
 
 
 #HOST = '192.168.0.108'
-HOST = '81.17.95.30'
+HOST = '192.168.60.2'
 CAMERAPORT = 8095
 SOUNDPORT=8094
 
