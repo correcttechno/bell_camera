@@ -21,7 +21,7 @@ SOUNDPORT=8094
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
-CHUNK_SIZE = 128
+CHUNK_SIZE = 1024
 
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,19 +56,19 @@ def cameraClient():
             cleanFrame=readCameraFrame()
             if cleanFrame is not None:
                 frame=cleanFrame
-                frame = imutils.resize(frame, width=320,height=240)
+                #frame = imutils.resize(frame, width=320,height=240)
             
                 frame = cv2.flip(frame,180)
                 result, image = cv2.imencode('.jpg', frame, encode_param)
                 data = pickle.dumps(image, 0)
                 size = len(data)
 
-                if img_counter%2==0:
+                if True:
+                  
                     if len(data)>0:
                         cameraSocket.sendall(struct.pack(">L", size) + data)
                     #cv2.imshow('client',frame)
-                    
-                img_counter += 1
+                    time.sleep(0.01)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     except:
