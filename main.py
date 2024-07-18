@@ -14,13 +14,11 @@ root = tk.Tk()
 splash()
 
 
-
-""" bg_image = tk.PhotoImage(file="home/msb/bell_camera/backgroundimage.png")#"/home/msb/bell_camera/backgroundimage.png")
+""""
+bg_image = tk.PhotoImage(file="assets/backgroundimage.png")#"/home/msb/bell_camera/backgroundimage.png")
 bg_label = tk.Label(root, image=bg_image)
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)
- """
-
-
+"""
 
 
 
@@ -36,7 +34,7 @@ display.place(x=670,y=40,width=259,height=60)
 
 canvas = tk.Canvas(root)
 canvas.place(x=70,y=100,width=500,height=400)
-canvas.config(background="#000000",borderwidth=0)
+canvas.config(background="#7203FF",borderwidth=0)
 
 
 #canvas.pack()
@@ -184,6 +182,7 @@ def updateCam():
         # Kamera görüntüsünü alma
         frame=readFaceidFrame()
         if frame is not None:
+            
             frame=cv2.resize(frame,(500,400))
             # OpenCV görüntüsünü Tkinter için uygun formata dönüştürme
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -196,6 +195,7 @@ def updateCam():
 
             # Tkinter penceresini yenileme
             root.update()
+            
 
 cameraCam= threading.Thread(target=updateCam)
 cameraCam.start()
@@ -205,7 +205,7 @@ cameraCam.start()
 
 # Navigasyon çubuğunu gizle
 root.overrideredirect(True)
-root.configure(background="#000000")
+root.configure(background="#7203FF")
 root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 
 

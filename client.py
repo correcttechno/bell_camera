@@ -50,7 +50,7 @@ except:
 
 def cameraClient():
     img_counter = 0
-    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),60]
+    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
     try:
         while True:
             cleanFrame=readCameraFrame()
