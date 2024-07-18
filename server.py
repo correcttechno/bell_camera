@@ -148,7 +148,7 @@ def startSoundBind(index):
         token = conn.recv(1024).decode("utf-8")
         if(token=="DOORBELL"):
             soundSender=conn
-            
+            print("DOOR BELL QOSULDU")
         else:
             soundReciver=conn
 
