@@ -182,8 +182,18 @@ def updateCam():
     frame = readFaceidFrame()
     if frame is not None:
         frame = cv2.resize(frame, (500, 400))
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
+        
+        # CUDA ile GPU'ya yükleme
+        gpu_frame = cv2.cuda_GpuMat()
+        gpu_frame.upload(frame)
+        
+        # GPU üzerinde işlemleri gerçekleştirme
+        gpu_frame = cv2.cuda.cvtColor(gpu_frame, cv2.COLOR_BGR2RGB)
+        
+        # CPU'ya geri yükleme
+        frame = gpu_frame.download()
+        
+        img = Image.fromarray(frame)
         img_tk = ImageTk.PhotoImage(image=img)
 
         # Eski görüntüyü silmek
@@ -194,7 +204,6 @@ def updateCam():
         current_image_id = canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
 
     root.after(50, updateCam)  # 50 ms sonra tekrar çalıştır
-            
 
 cameraCam= threading.Thread(target=updateCam)
 cameraCam.start()
