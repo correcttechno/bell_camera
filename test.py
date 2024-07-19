@@ -4,7 +4,7 @@ import pyaudio
 audio = pyaudio.PyAudio()
 
 # USB ses aygıtını bulun
-info = audio.get_host_api_info_by_index(1)
+info = audio.get_host_api_info_by_index(0)
 numdevices = info.get('deviceCount')
 usb_device_index = None
 
