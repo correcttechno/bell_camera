@@ -33,7 +33,7 @@ display.place(x=670,y=40,width=259,height=60)
 
 
 canvas = tk.Canvas(root)
-canvas.place(x=70,y=100,width=250,height=200)
+canvas.place(x=70,y=100,width=500,height=400)
 canvas.config(background="#000000",borderwidth=0)
 
 
