@@ -1,7 +1,7 @@
 import threading
 import cv2
 
-cam = cv2.VideoCapture("rtsp://admin:ruslan1424%@192.168.16.64:554/Streaming/Channels/101")
+cam = cv2.VideoCapture(0)
 
 cleanFrame=None
 
