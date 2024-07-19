@@ -34,7 +34,7 @@ display.place(x=670,y=40,width=259,height=60)
 
 canvas = tk.Canvas(root)
 canvas.place(x=70,y=100,width=500,height=400)
-canvas.config(background="#7203FF",borderwidth=0)
+canvas.config(background="#000000",borderwidth=0)
 
 
 #canvas.pack()
@@ -166,7 +166,7 @@ GButton_339["font"] = ft
 GButton_339["fg"] = "#000000"
 GButton_339["justify"] = "center"
 GButton_339["text"] = "CALL"
-GButton_339.place(x=670,y=470,width=260,height=49)
+GButton_339.place(x=670,y=470,width=130,height=49)
 
    
 
@@ -176,25 +176,24 @@ def ButtonClick(number):
     display.insert(0, str(current) + str(number))
 
    
-
+current_image_id=0
 def updateCam():
-    while True:
-        # Kamera görüntüsünü alma
-        frame=readFaceidFrame()
-        if frame is not None:
-            
-            frame=cv2.resize(frame,(500,400))
-            # OpenCV görüntüsünü Tkinter için uygun formata dönüştürme
-            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(img)
-            img_tk = ImageTk.PhotoImage(image=img)
-            
+    global img_tk, current_image_id
+    frame = readFaceidFrame()
+    if frame is not None:
+        frame = cv2.resize(frame, (500, 400))
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
+        img_tk = ImageTk.PhotoImage(image=img)
 
-            # Canvas'a görüntüyü ekleme
-            canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+        # Eski görüntüyü silmek
+        if current_image_id is not None:
+            canvas.delete(current_image_id)
 
-            # Tkinter penceresini yenileme
-            root.update()
+        # Yeni görüntüyü eklemek
+        current_image_id = canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+
+    root.after(50, updateCam)  # 50 ms sonra tekrar çalıştır
             
 
 cameraCam= threading.Thread(target=updateCam)
@@ -205,7 +204,7 @@ cameraCam.start()
 
 # Navigasyon çubuğunu gizle
 root.overrideredirect(True)
-root.configure(background="#7203FF")
+root.configure(background="#000000")
 root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 
 

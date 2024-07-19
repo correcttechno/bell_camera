@@ -83,6 +83,7 @@ def faceIdCallback():
 
                     top, right, bottom, left = face_location
                     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 1)
+                    print(name)
 
                     # yüz ismini dikdörtgenin üstüne yaz
                     #cv2.rectangle(frame, (left, bottom - 20), (right, bottom), (0, 255, 0), cv2.FILLED)

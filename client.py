@@ -82,7 +82,8 @@ audio = pyaudio.PyAudio()
 
 
 stream_in = audio.open(format=FORMAT, channels=CHANNELS,
-                rate=RATE, input=True,input_device_index=11,
+                rate=RATE, input=True,
+                input_device_index=11,
                 frames_per_buffer=CHUNK_SIZE)
     
 
