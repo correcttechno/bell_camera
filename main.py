@@ -1,9 +1,9 @@
 
 import threading
 import cv2
-from flask import Flask, Response
+from flask import Flask, Response, render_template
 from client import setClientCameraFrame
-from faceid import setFaceIDCameraFrame
+from faceid import readFaceidFrame, setFaceIDCameraFrame
 
 
 
@@ -21,7 +21,11 @@ def generate_frames():
         if not success:
             break
         setFaceIDCameraFrame(frame)    
-        setClientCameraFrame(frame)    
+        setClientCameraFrame(frame) 
+
+        faceID=readFaceidFrame()
+        if faceID is not None:
+            frame=faceID
         # Frame'i JPEG formatına çevir
         _, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
@@ -37,16 +41,11 @@ def video_feed():
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+@app.route('/')
+
 @app.route('/')
 def index():
-    return """
-    <html>
-        <body>
-            <h1>Webcam Video Feed</h1>
-            <img src="/video_feed">
-        </body>
-    </html>
-    """
-
+    return render_template("index.html")
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
