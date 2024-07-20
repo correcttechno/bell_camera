@@ -10,6 +10,8 @@ from camera import readCameraFrame
 #from client import setClientCameraFrame
 from faceid import setFaceIDCameraFrame
 
+cam = cv2.VideoCapture(0)
+
 app = Flask(__name__)
 
 def generate_frames():
@@ -17,7 +19,7 @@ def generate_frames():
     
     while True:
         # Frame'leri oku
-        success, frame = readCameraFrame()
+        success, frame = cam.read()
         if not success:
             break
         setFaceIDCameraFrame(frame)    
