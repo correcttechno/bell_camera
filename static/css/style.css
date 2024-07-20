@@ -32,7 +32,7 @@ body {
     width:70%;
     height: 80vh;
     background-color: #FF7C02;
-    border-radius: 40px;
+    border-radius: 30px;
     box-shadow: 0px 10px 80px rgba(0, 0, 0, 0.178);
     overflow: hidden;
 }
@@ -50,8 +50,8 @@ body {
 .keypad{
     padding: 30px 10px 10px 10px;
     background-color: #ffffff;
-    border-bottom-left-radius: 40px;
-    border-bottom-right-radius: 40px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
 }
 
 
