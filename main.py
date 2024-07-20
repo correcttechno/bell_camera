@@ -6,7 +6,6 @@ import cv2
 from flask import Flask, Response
 import cv2
 
-from camera import readCameraFrame
 #from client import setClientCameraFrame
 from faceid import setFaceIDCameraFrame
 
