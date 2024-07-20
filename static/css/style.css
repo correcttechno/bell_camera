@@ -56,13 +56,13 @@ body {
 
 
 .keypad .dots{
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 .keypad .dots ul li{
     display: inline-block;
-    height: 30px;
-    width: 30px;
+    height: 20px;
+    width: 20px;
     background-color: #F2F2F2;
     border:1px solid #626262;
     border-radius: 5px;
@@ -84,10 +84,10 @@ body {
 
 .keypad .num ul li{
     display: inline-block;
-    font-size: 60px;
+    font-size: 40px;
     font-weight: 900;
     color:#404040;
-    padding:37px 0px;
+    padding:12px 0px;
     flex: 1;
     text-align: center;
     cursor: pointer;
@@ -101,17 +101,21 @@ body {
     position: relative;
     display: flex;
     background-color: #FF7C02;
-    padding:10px 0px;
+    padding:20px 0px;
+}
+
+.doorbell img{
+    height: 75px;
 }
 
 .doorbell>div{
-    padding: 20px 0px;
+    padding: 0px 0px;
     display:flex;
     flex: 1;
     text-align: center;
     justify-content: center;
     justify-items: center;
-    font-size: 50px;
+    font-size: 30px;
     font-weight: 900;
     color: #fff;
     cursor: pointer;;
@@ -119,5 +123,5 @@ body {
 
 .doorbell>div:nth-child(2){
     flex:2;
-    padding: 50px;
+    padding: 14px 0px;
 }
