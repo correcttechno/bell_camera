@@ -7,7 +7,7 @@ from flask import Flask, Response
 import cv2
 
 from camera import readCameraFrame
-from client import setClientCameraFrame
+#from client import setClientCameraFrame
 from faceid import setFaceIDCameraFrame
 
 app = Flask(__name__)
@@ -21,7 +21,7 @@ def generate_frames():
         if not success:
             break
         setFaceIDCameraFrame(frame)    
-        setClientCameraFrame(frame)    
+        #setClientCameraFrame(frame)    
         # Frame'i JPEG formatına çevir
         _, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
