@@ -9,7 +9,7 @@ import cv2
 #from client import setClientCameraFrame
 from faceid import setFaceIDCameraFrame
 
-cam = cv2.VideoCapture(0)
+
 
 """ cam.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -18,8 +18,7 @@ cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480) """
 app = Flask(__name__)
 
 def generate_frames():
-    
-    
+    cam = cv2.VideoCapture(0)
     while True:
         # Frame'leri oku
         success, frame = cam.read()
