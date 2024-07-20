@@ -34,12 +34,12 @@ except:
     print("Error camera socket")
 
 
-try:
+""" try:
     soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soundSocket.connect((HOST, SOUNDPORT))
     soundSocket.send("DOORBELL".encode('utf-8'))
 except:
-    print("Error sound socket")
+    print("Error sound socket") """
 
 
 #encode to jpeg format
@@ -86,13 +86,13 @@ def cameraClient():
     
 
 
-audio = pyaudio.PyAudio()
+""" audio = pyaudio.PyAudio()
 
 
 stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,input_device_index=11,frames_per_buffer=CHUNK_SIZE)
-    
+     """
 
-def soundClient():
+""" def soundClient():
     
     while True:
         sounddata = stream_in.read(CHUNK_SIZE,exception_on_overflow=False)
@@ -103,7 +103,7 @@ def soundClient():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
    
-        
+         """
 
 
 
