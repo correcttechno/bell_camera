@@ -1,12 +1,86 @@
 <html>
 
 <head>
+    <title>MSB</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" /> -->
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}" />
+
+
+    <!-- <link rel="stylesheet" href="../static/css/style.css" />
+    <link rel="stylesheet" href="../static/css/stylesheet.css" /> -->
+
+
 </head>
 
 <body>
-    <h1>Webcam Video Feed</h1>
-    <img src="/video_feed">
+
+
+    <div class="cam">
+        <img src="/video_feed">
+    </div>
+
+    <div class="navigation">
+
+        <div class="control">
+
+            <div class="keypad">
+                <div class="dots">
+                    <ul>
+                        <li class="active"></li>
+                        <li></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+
+                <div class="num">
+                    <ul>
+                        <li>1</li>
+                        <li>2</li>
+                        <li>3</li>
+                    </ul>
+                    <ul>
+                        <li>4</li>
+                        <li>5</li>
+                        <li>6</li>
+
+                    </ul>
+                    <ul>
+                        <li>7</li>
+                        <li>8</li>
+                        <li>9</li>
+                    </ul>
+                    <ul>
+                        <li>*</li>
+                        <li>0</li>
+                        <li>#</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="doorbell">
+                <div>
+                    <img src="{{ url_for('static', filename='img/left.png') }}" />
+                </div>
+                <div>
+                    DOOR BELL
+                </div>
+                <div>
+                    <img src="{{ url_for('static', filename='img/right.png') }}" />
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+
 </body>
 
 </html>
