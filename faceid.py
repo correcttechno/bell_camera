@@ -6,6 +6,7 @@ import os
 
 from camera import readCameraFrame
 
+CAMERAFRAME=None
 # tanınan yüzlerin özellikleri
 known_faces = []
 
@@ -32,9 +33,10 @@ for filename in os.listdir(known_faces_dir):
 
 def faceIdCallback():
     global faceIdFrame
+    global CAMERAFRAME
     while True:
         # video akışından bir kare al
-        frame = readCameraFrame()
+        frame = CAMERAFRAME
         if frame is not None:
             frame=cv2.resize(frame,(640,480))
             
@@ -102,5 +104,9 @@ def faceIdCallback():
 def readFaceidFrame():
     global faceIdFrame
     return faceIdFrame
+
+def setFaceIDCameraFrame(fr):
+    global CAMERAFRAME
+    CAMERAFRAME=fr
    
-threading.Thread(target=faceIdCallback).start()
+threading.Thread(target=faceIdCallback,daemon=True).start()

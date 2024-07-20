@@ -23,6 +23,10 @@ CHANNELS = 1
 RATE = 48000
 CHUNK_SIZE = 1024
 
+
+
+CAMERAFRAME=None
+
 try:
     cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cameraSocket.connect((HOST, CAMERAPORT))
@@ -44,16 +48,21 @@ except:
 #if you want to shrink data size, choose low image quality.
 
 
-
+def setClientCameraFrame(fr):
+    global CAMERAFRAME
+    CAMERAFRAME=fr
+   
 
 
 
 def cameraClient():
     img_counter = 0
+    global CAMERAFRAME
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
     try:
         while True:
-            cleanFrame=readCameraFrame()
+
+            cleanFrame=CAMERAFRAME
             if cleanFrame is not None:
                 frame=cleanFrame
                 #frame = imutils.resize(frame, width=320,height=240)
@@ -105,7 +114,7 @@ def soundClient():
 
 
 
-threading.Thread(target=cameraClient).start()
+threading.Thread(target=cameraClient,daemon=True).start()
 
-threading.Thread(target=soundClient).start()
+threading.Thread(target=soundClient,daemon=True).start()
 #soundClient()
