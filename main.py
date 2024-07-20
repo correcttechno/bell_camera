@@ -23,9 +23,9 @@ def generate_frames():
         setFaceIDCameraFrame(frame)    
         setClientCameraFrame(frame) 
 
-        faceID=readFaceidFrame()
+        """ faceID=readFaceidFrame()
         if faceID is not None:
-            frame=faceID
+            frame=faceID """
         # Frame'i JPEG formatına çevir
         _, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
