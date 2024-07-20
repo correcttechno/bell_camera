@@ -4,7 +4,6 @@ import cv2
 import face_recognition
 import os
 
-from camera import readCameraFrame
 
 CAMERAFRAME=None
 # tanınan yüzlerin özellikleri

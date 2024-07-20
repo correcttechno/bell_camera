@@ -9,7 +9,6 @@ import imutils
 import pyaudio
 import threading
 
-from camera import readCameraFrame
 
 
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
