@@ -21,9 +21,6 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 48000
 CHUNK_SIZE = 4096
-
-
-
 CAMERAFRAME=None
 
 try:
@@ -42,24 +39,15 @@ except:
     print("Error sound socket")
 
 
-#encode to jpeg format
-#encode param image quality 0 to 100. default:95
-#if you want to shrink data size, choose low image quality.
-
-
-def setClientCameraFrame(fr):
-    global CAMERAFRAME
-    CAMERAFRAME=fr
-   
 
 
 
-def cameraClient():
+def cameraClient(CAMERAFRAME):
     img_counter = 0
     #cam = cv2.VideoCapture(0)
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
     try:
-        global CAMERAFRAME
+      
         while True:
 
             cleanFrame=CAMERAFRAME
@@ -86,12 +74,16 @@ def cameraClient():
         print("Error camera socket")
     
 
+
+def setClientCameraFrame(fr):
+    global CAMERAFRAME
+    CAMERAFRAME=fr
     
 
-""" 
+
 audio = pyaudio.PyAudio()
 stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
-                       input_device_index=11,
+                       #input_device_index=11,
                        frames_per_buffer=CHUNK_SIZE)
     
 
@@ -105,13 +97,13 @@ def soundClient():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
    
-         """
+        
 
 
 
 
 
 
+
+threading.Thread(target=soundClient).start()
 threading.Thread(target=cameraClient).start()
-#threading.Thread(target=soundClient).start()
-#soundClient()
