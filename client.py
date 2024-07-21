@@ -56,14 +56,14 @@ def setClientCameraFrame(fr):
 
 def cameraClient():
     img_counter = 0
-    cam = cv2.VideoCapture(0)
+    #cam = cv2.VideoCapture(0)
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
     try:
         global CAMERAFRAME
         while True:
 
             cleanFrame=CAMERAFRAME
-            success, cleanFrame = cam.read()
+            #success, cleanFrame = cam.read()
 
             if cleanFrame is not None:
                 frame=cleanFrame
