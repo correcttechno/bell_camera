@@ -19,7 +19,7 @@ SOUNDPORT=8094
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 44100
+RATE = 48000
 CHUNK_SIZE = 4096
 
 
@@ -113,5 +113,5 @@ def soundClient():
 
 
 threading.Thread(target=cameraClient).start()
-#threading.Thread(target=soundClient).start()
+threading.Thread(target=soundClient).start()
 #soundClient()
