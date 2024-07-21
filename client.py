@@ -56,12 +56,14 @@ def setClientCameraFrame(fr):
 
 def cameraClient():
     img_counter = 0
-    global CAMERAFRAME
+    cam = cv2.VideoCapture(0)
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
     try:
+        global CAMERAFRAME
         while True:
 
-            cleanFrame=CAMERAFRAME
+            #cleanFrame=CAMERAFRAME
+            success, cleanFrame = cam.read()
 
             if cleanFrame is not None:
                 frame=cleanFrame
@@ -113,7 +115,7 @@ def soundClient():
 
 
 
-#threading.Thread(target=cameraClient).start()
+threading.Thread(target=cameraClient).start()
 
 #threading.Thread(target=soundClient).start()
 #soundClient()

@@ -14,7 +14,7 @@ import imutils
 from PIL import Image, ImageOps
 import asyncio
 import websockets
-#import mediapipe as mp
+import mediapipe as mp
 #import pyaudio
 from http import server
 import socketserver
@@ -22,7 +22,7 @@ import socketserver
 
 
 #HOST = '192.168.0.108'
-HOST = '192.168.60.2'
+HOST = '162.214.48.246'
 CAMERAPORT = 8095
 SOUNDPORT=8094
 
@@ -109,14 +109,14 @@ def startCamera(index):
                 frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
                 
 
-                frame = imutils.resize(frame, width=320)
+                #frame = imutils.resize(frame, width=320)
                 # 鏡像
                 frame = cv2.flip(frame,180)
                 result, image = cv2.imencode('.jpg', frame, encode_param)
                 MYFR[0]=image
             
                 if cameraReciver is not None:
-                    #print("Video Sended")
+                    print("Video Sended")
                     mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
                     cameraReciver.sendall(mydata)
             except :
@@ -148,7 +148,7 @@ def startSoundBind(index):
         token = conn.recv(1024).decode("utf-8")
         if(token=="DOORBELL"):
             soundSender=conn
-            print("DOOR BELL QOSULDU")
+            
         else:
             soundReciver=conn
 
@@ -168,7 +168,7 @@ def startSound(index):
             #stream_out.write(sounddata)
             try:
                 if soundReciver is not None:
-                    #print("Sound Sended")
+                    print("Sound Sended")
                     soundReciver.sendall(sounddata)   
             except:
                 print("close sound socket")
