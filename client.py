@@ -88,7 +88,7 @@ def cameraClient():
 
     
 
-
+""" 
 audio = pyaudio.PyAudio()
 stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
                        input_device_index=11,
@@ -105,7 +105,7 @@ def soundClient():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
    
-        
+         """
 
 
 
@@ -113,5 +113,5 @@ def soundClient():
 
 
 threading.Thread(target=cameraClient).start()
-threading.Thread(target=soundClient).start()
+#threading.Thread(target=soundClient).start()
 #soundClient()
