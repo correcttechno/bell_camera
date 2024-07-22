@@ -12,8 +12,8 @@ import threading
 
 
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
-HOST = '192.168.16.102'
-#HOST = '162.214.48.246'
+#HOST = '192.168.16.102'
+HOST = '162.214.48.246'
 CAMERAPORT = 8095
 SOUNDPORT=8094
 
@@ -81,7 +81,7 @@ def setClientCameraFrame(fr):
     
 
 
-audio = pyaudio.PyAudio()
+""" audio = pyaudio.PyAudio()
 stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
                        input_device_index=11,
                        frames_per_buffer=CHUNK_SIZE)
@@ -98,7 +98,7 @@ def soundClient():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     except:
-        print("Error sound socket")
+        print("Error sound socket") """
    
         
 
@@ -108,5 +108,6 @@ def soundClient():
 
 
 
-threading.Thread(target=soundClient).start()
+
 threading.Thread(target=cameraClient).start()
+""" threading.Thread(target=soundClient).start() """
