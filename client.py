@@ -88,14 +88,17 @@ stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
     
 
 def soundClient():
-    while True:
-        sounddata = stream_in.read(CHUNK_SIZE,exception_on_overflow=False)
-     
-        if len(sounddata)>0:
-            soundSocket.sendall(sounddata)
-           
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    try:
+        while True:
+            sounddata = stream_in.read(CHUNK_SIZE,exception_on_overflow=False)
+        
+            if len(sounddata)>0:
+                soundSocket.sendall(sounddata)
+            
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    except:
+        print("Error sound socket")
    
         
 
