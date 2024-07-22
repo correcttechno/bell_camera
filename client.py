@@ -44,14 +44,14 @@ except:
 
 def cameraClient():
     img_counter = 0
-    cam = cv2.VideoCapture(0)
+    #cam = cv2.VideoCapture(0)
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
     try:
         global CAMERAFRAME
         while True:
 
             cleanFrame=CAMERAFRAME
-            success, cleanFrame = cam.read()
+            #success, cleanFrame = cam.read()
 
             if cleanFrame is not None:
                 frame=cleanFrame
@@ -84,7 +84,7 @@ def setClientCameraFrame(fr):
 
 audio = pyaudio.PyAudio()
 stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
-                       input_device_index=11,
+                       #input_device_index=11,
                        frames_per_buffer=CHUNK_SIZE)
  
 def soundClient():
