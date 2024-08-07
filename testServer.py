@@ -1,84 +1,60 @@
 import socket
-import select
+import threading
 
-# Sunucu bilgileri
-HOST = '127.0.0.1'
-PORT = 65432
-
-# Sunucu socket oluşturma ve ayarlarını yapma
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server_socket.bind((HOST, PORT))
-server_socket.listen()
-
-# Açık soketleri takip eden liste
-sockets_list = [server_socket]
-
-# Kullanıcı adlarıyla eşleşen socket bağlantılarını takip eden dictionary
+HEADER_LENGTH = 10
 clients = {}
 
-print(f"Listening for connections on {HOST}:{PORT}...")
-
-def receive_message(client_socket):
+def handle_client(client_socket, addr):
+    print(f"Yeni bağlantı: {addr}")
+    
     try:
-        message_header = client_socket.recv(10)
-        if not len(message_header):
-            return False
-        message_length = int(message_header.decode('utf-8').strip())
-        return {'header': message_header, 'data': client_socket.recv(message_length)}
+        username_header = client_socket.recv(HEADER_LENGTH)
+        username_length = int(username_header.decode('utf-8').strip())
+        username = client_socket.recv(username_length).decode('utf-8')
+        clients[client_socket] = username
+        print(f"Kullanıcı adı {username} olarak belirlendi.")
     except:
-        return False
+        client_socket.close()
+        return
 
-while True:
-    read_sockets, _, exception_sockets = select.select(sockets_list, [], sockets_list)
+    while True:
+        try:
+            message_header = client_socket.recv(HEADER_LENGTH)
+            if not len(message_header):
+                break
+            message_length = int(message_header.decode('utf-8').strip())
+            message = client_socket.recv(message_length).decode('utf-8')
 
-    for notified_socket in read_sockets:
-        if notified_socket == server_socket:
-            client_socket, client_address = server_socket.accept()
-            user = receive_message(client_socket)
-            if user is False:
-                continue
+            broadcast(message, client_socket)
+        except:
+            clients.pop(client_socket, None)
+            client_socket.close()
+            print(f"Bağlantı kesildi: {addr}")
+            break
 
-            user_name = user['data'].decode('utf-8')
-            sockets_list.append(client_socket)
-            clients[client_socket] = user_name
+def broadcast(message, current_client):
+    username = clients[current_client]
+    formatted_message = f"{username}: {message}".encode('utf-8')
+    message_header = f"{len(formatted_message):<{HEADER_LENGTH}}".encode('utf-8')
 
-            print(f"Accepted new connection from {client_address[0]}:{client_address[1]} username:{user_name}")
+    for client in clients:
+        if client != current_client:
+            try:
+                client.send(message_header + formatted_message)
+            except:
+                clients.pop(client, None)
+                client.close()
 
-        else:
-            message = receive_message(notified_socket)
-            if message is False:
-                user_name = clients[notified_socket]
-                print(f"Closed connection from {user_name}")
-                sockets_list.remove(notified_socket)
-                del clients[notified_socket]
-                continue
+def start_server():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('127.0.0.1', 5555))
+    server.listen(5)  # Daha fazla client'ı destekleyebilir
+    print("Server dinleniyor...")
 
-            user_name = clients[notified_socket]
-            print(f"Received message from {user_name}: {message['data'].decode('utf-8')}")
+    while True:
+        client_socket, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(client_socket, addr))
+        thread.start()
 
-            # Mesaj formatı: "@username mesaj"
-            message_content = message['data'].decode('utf-8')
-            if message_content.startswith('@'):
-                target_username, message_text = message_content.split(' ', 1)
-                target_username = target_username[1:]
-
-                target_socket = None
-                for sock, uname in clients.items():
-                    if uname == target_username:
-                        target_socket = sock
-                        break
-
-                if target_socket:
-                    target_socket.send(f"{user_name}: {message_text}".encode('utf-8'))
-                else:
-                    notified_socket.send(f"User {target_username} not found.".encode('utf-8'))
-            else:
-                # Mesajı tüm client'lara gönder
-                for client_socket in clients:
-                    if client_socket != notified_socket:
-                        client_socket.send(f"{user_name}: {message_content}".encode('utf-8'))
-
-    for notified_socket in exception_sockets:
-        sockets_list.remove(notified_socket)
-        del clients[notified_socket]
+if __name__ == "__main__":
+    start_server()

@@ -1,39 +1,43 @@
 import socket
 import threading
 
-# Sunucu bilgileri
 HEADER_LENGTH = 10
-HOST = '127.0.0.1'
-PORT = 65432
 
 def receive_messages(client_socket):
     while True:
         try:
-            message = client_socket.recv(1024)
-            if not message:
-                print("Connection closed by the server")
+            message_header = client_socket.recv(HEADER_LENGTH)
+            if not len(message_header):
                 break
-            print(message.decode('utf-8'))
-        except Exception as e:
-            print('Error receiving message', str(e))
+            message_length = int(message_header.decode('utf-8').strip())
+            message = client_socket.recv(message_length).decode('utf-8')
+            print(message)
+        except:
+            print("Server bağlantısı kesildi.")
+            client_socket.close()
             break
 
-username = input("Username: ")
+def start_client():
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(('127.0.0.1', 5555))
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((HOST, PORT))
-client_socket.setblocking(False)
+    username = input("Kullanıcı adınızı girin: ")
+    username = username.encode('utf-8')
+    username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
+    client.send(username_header + username)
 
-username = username.encode('utf-8')
-username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
-client_socket.send(username_header + username)
+    thread = threading.Thread(target=receive_messages, args=(client,))
+    thread.start()
 
-receive_thread = threading.Thread(target=receive_messages, args=(client_socket,))
-receive_thread.start()
-
-while True:
-    message = input(f"{username.decode('utf-8')} > ")
-    if message:
+    while True:
+        message = input("")
+        if message.lower() == 'exit':
+            break
         message = message.encode('utf-8')
         message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
-        client_socket.send(message_header + message)
+        client.send(message_header + message)
+
+    client.close()
+
+if __name__ == "__main__":
+    start_client()
