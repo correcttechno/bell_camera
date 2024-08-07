@@ -24,7 +24,6 @@ def handle_client(client_socket, addr):
                 break
             message_length = int(message_header.decode('utf-8').strip())
             message = client_socket.recv(message_length)
-
             broadcast(message, client_socket)
         except:
             clients.pop(client_socket, None)
@@ -36,15 +35,16 @@ def broadcast(message, current_client):
     for client in clients:
         if client != current_client:
             try:
-                client.send(message)
+                message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
+                client.send(message_header + message)
             except:
                 clients.pop(client, None)
                 client.close()
 
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('0.0.0.0', 8094))
-    server.listen(5)  # Daha fazla client'ı destekleyebilir
+    server.bind(('127.0.0.1', 8094))
+    server.listen(5)
     print("Server dinleniyor...")
 
     while True:
