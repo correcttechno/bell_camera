@@ -2,6 +2,12 @@ import socket
 import threading
 import pyaudio
 
+
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 48000
+CHUNK_SIZE = 4096
+
 HEADER_LENGTH = 10
 
 def receive_messages(client_socket, stream_out):
@@ -30,11 +36,9 @@ def start_client():
     p = pyaudio.PyAudio()
     
     # Mikrofon için ayarlar
-    stream_in = p.open(format=pyaudio.paInt16,
-                       channels=1,
-                       rate=44100,
-                       input=True,
-                       frames_per_buffer=1024)
+    stream_in = p.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
+                
+                       frames_per_buffer=CHUNK_SIZE)
 
     # Hoparlör için ayarlar
     stream_out = p.open(format=pyaudio.paInt16,
