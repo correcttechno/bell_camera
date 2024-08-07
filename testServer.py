@@ -1,56 +1,47 @@
 import socket
+import pyaudio
 import threading
 
-HEADER_LENGTH = 10
-clients = {}
+# Audio settings
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 48000
+CHUNK_SIZE = 4096
+
+# Socket settings
+IP = "192.168.16.103"
+PORT = 8094
+
+# Create a socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((IP, PORT))
+server_socket.listen(2)
+
+print(f"Server listening on {IP}:{PORT}")
+
+clients = []
 
 def handle_client(client_socket, addr):
-    print(f"Yeni bağlantı: {addr}")
-    
-    try:
-        username_header = client_socket.recv(HEADER_LENGTH)
-        username_length = int(username_header.decode('utf-8').strip())
-        username = client_socket.recv(username_length).decode('utf-8')
-        clients[client_socket] = username
-        print(f"Kullanıcı adı {username} olarak belirlendi.")
-    except:
-        client_socket.close()
-        return
-
+    global clients
+    print(f"Connection from {addr}")
     while True:
         try:
-            message_header = client_socket.recv(HEADER_LENGTH)
-            if not len(message_header):
+            data = client_socket.recv(CHUNK_SIZE)
+            if not data:
                 break
-            message_length = int(message_header.decode('utf-8').strip())
-            message = client_socket.recv(message_length)
-            broadcast(message, client_socket)
-        except:
-            clients.pop(client_socket, None)
-            client_socket.close()
-            print(f"Bağlantı kesildi: {addr}")
+            for client in clients:
+                if client != client_socket:
+                    client.sendall(data)
+        except ConnectionResetError:
             break
 
-def broadcast(message, current_client):
-    for client in clients:
-        if client != current_client:
-            try:
-                message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
-                client.send(message_header + message)
-            except:
-                clients.pop(client, None)
-                client.close()
+    clients.remove(client_socket)
+    client_socket.close()
+    print(f"Connection closed from {addr}")
 
-def start_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('127.0.0.1', 8094))
-    server.listen(5)
-    print("Server dinleniyor...")
-
-    while True:
-        client_socket, addr = server.accept()
-        thread = threading.Thread(target=handle_client, args=(client_socket, addr))
-        thread.start()
-
-if __name__ == "__main__":
-    start_server()
+# Accept clients
+while len(clients) < 2:
+    client_socket, addr = server_socket.accept()
+    clients.append(client_socket)
+    client_thread = threading.Thread(target=handle_client, args=(client_socket, addr))
+    client_thread.start()
