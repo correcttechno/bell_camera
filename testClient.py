@@ -51,7 +51,7 @@ def start_client():
     thread.start()
 
     while True:
-        data = stream_in.read(1024)
+        data = stream_in.read(CHUNK_SIZE,exception_on_overflow=False)
         message_header = f"{len(data):<{HEADER_LENGTH}}".encode('utf-8')
         client.send(message_header + data)
 
