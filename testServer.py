@@ -1,47 +1,21 @@
-import socket
+import socketio
 import pyaudio
-import threading
 
-# Audio settings
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 48000
-CHUNK_SIZE = 4096
+# SocketIO sunucusunu oluştur
+sio = socketio.Server()
+app = socketio.WSGIApp(sio)
 
-# Socket settings
-IP = "192.168.16.103"
-PORT = 8094
+# PyAudio ile ses çıkışı ayarları
+p = pyaudio.PyAudio()
+stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, output=True)
 
-# Create a socket
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((IP, PORT))
-server_socket.listen(2)
+# İstemciden gelen ses verilerini hoparlörde oynat
+@sio.event
+def audio_data(sid, data):
+    stream.write(data)
 
-print(f"Server listening on {IP}:{PORT}")
+if __name__ == '__main__':
+    import eventlet
+    import eventlet.wsgi
 
-clients = []
-
-def handle_client(client_socket, addr):
-    global clients
-    print(f"Connection from {addr}")
-    while True:
-        try:
-            data = client_socket.recv(CHUNK_SIZE)
-            if not data:
-                break
-            for client in clients:
-                if client != client_socket:
-                    client.sendall(data)
-        except ConnectionResetError:
-            break
-
-    clients.remove(client_socket)
-    client_socket.close()
-    print(f"Connection closed from {addr}")
-
-# Accept clients
-while len(clients) < 2:
-    client_socket, addr = server_socket.accept()
-    clients.append(client_socket)
-    client_thread = threading.Thread(target=handle_client, args=(client_socket, addr))
-    client_thread.start()
+    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)

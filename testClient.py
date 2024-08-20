@@ -1,49 +1,29 @@
-import socket
+import socketio
 import pyaudio
-import threading
 
-# Audio settings
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 48000
-CHUNK_SIZE = 4096
+# SocketIO istemcisini oluştur
+sio = socketio.Client()
 
-# Socket settings
-IP = "192.168.16.103"
-PORT = 8094
+# PyAudio ile ses giriş ayarları
+p = pyaudio.PyAudio()
+stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True, frames_per_buffer=1024)
 
-# Create a socket
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((IP, PORT))
+# Sunucuya bağlan
+sio.connect('http://127.0.0.1:5000')
 
-audio = pyaudio.PyAudio()
-
-# Initialize microphone stream
-mic_stream = audio.open(format=FORMAT, channels=CHANNELS,
-                        rate=RATE, input=True,
-                        frames_per_buffer=CHUNK_SIZE)
-
-# Initialize speaker stream
-speaker_stream = audio.open(format=FORMAT, channels=CHANNELS,
-                            rate=RATE, output=True,
-                            frames_per_buffer=CHUNK_SIZE)
-
+# Ses verisini mikrofondan alıp sunucuya gönder
 def send_audio():
-    while True:
-        data = mic_stream.read(CHUNK_SIZE)
-        client_socket.sendall(data)
+    try:
+        while True:
+            data = stream.read(1024)
+            sio.emit('audio_data', data)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+        sio.disconnect()
 
-def receive_audio():
-    while True:
-        data = client_socket.recv(CHUNK_SIZE)
-        speaker_stream.write(data)
-
-# Start sending and receiving threads
-send_thread = threading.Thread(target=send_audio)
-receive_thread = threading.Thread(target=receive_audio)
-
-send_thread.start()
-receive_thread.start()
-
-send_thread.join()
-receive_thread.join()
+if __name__ == '__main__':
+    send_audio()
