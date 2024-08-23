@@ -1,40 +1,39 @@
 import socketio
 import pyaudio
-import numpy as np
+import wave
 
+# Socket.IO istemcisi oluşturun
 sio = socketio.Server()
+app = socketio.WSGIApp(sio)
 
 # PyAudio ayarları
 p = pyaudio.PyAudio()
-stream = p.open(format=pyaudio.paInt16,
-                channels=1,
-                rate=16000,
-                output=True)
+rate = 44100  # Örnekleme hızı
+channels = 1  # Kanal sayısı (mono)
+format = pyaudio.paInt16  # PCM16 formatı
+
+# WAV dosyasını yazmak için ayarları yapın
+wav_file = wave.open('output.wav', 'wb')
+wav_file.setnchannels(channels)
+wav_file.setsampwidth(p.get_sample_size(format))
+wav_file.setframerate(rate)
 
 @sio.event
 def connect(sid, environ):
-    print('Client connected:', sid)
+    print(f"Client connected: {sid}")
 
 @sio.event
 def disconnect(sid):
-    print('Client disconnected:', sid)
+    print(f"Client disconnected: {sid}")
 
 @sio.event
 def audio_data(sid, data):
-    print('Received audio data of length:', len(data))
-    # Gelen ses verisini anlık olarak hoparlörden çıkış al
-    stream.write(data)
+    # Gelen PCM16 formatındaki ses verisini WAV dosyasına yazın
+    wav_file.writeframes(data)
 
 if __name__ == '__main__':
     import eventlet
-    import eventlet.wsgi
-    from flask import Flask
-
-    # Flask uygulaması oluşturma
-    app = Flask(__name__)
-
-    # SocketIO WSGI uygulaması ile Flask uygulamasını birleştirme
-    app = socketio.WSGIApp(sio, app)
-
-    # Sunucuyu başlatma
     eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 5000)), app)
+
+    # Server kapatıldığında WAV dosyasını kapatın
+    wav_file.close()
