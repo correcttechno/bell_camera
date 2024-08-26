@@ -1,12 +1,12 @@
 import socket
 import threading
 
-import pyaudio
+#import pyaudio
 
-audio = pyaudio.PyAudio()
+#audio = pyaudio.PyAudio()
 
-stream_out = audio.open(format=pyaudio.paInt16, channels=1, rate=44100, output=True)
-
+#stream_out = audio.open(format=pyaudio.paInt16, channels=1, rate=44100, output=True)
+#stream_in = audio.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True,frames_per_buffer=4096)
 
 
 
@@ -24,14 +24,15 @@ server.listen(5)
 print(f"Server started on {HOST}:{PORT}")
 
 def broadcast(data, conn):
-    stream_out.write(data)
+    #stream_out.write(data)
+
     """Bir istemciden gelen veriyi diğer tüm istemcilere gönderir"""
     for client in clients:
         if client != conn:
             try:
                 client.sendall(data)
             except:
-                clients.remove(client)
+               clients.remove(client)
 
 def handle_client(conn, addr):
     """Her istemci bağlantısı için bu fonksiyon çalışır"""
@@ -43,7 +44,7 @@ def handle_client(conn, addr):
             data = conn.recv(4096)  # Veriyi al
             if not data:
                 break
-            broadcast(data, conn)  # Veriyi diğer istemcilere gönder
+            broadcast(data, conn)  
         except:
             break
     
@@ -55,7 +56,7 @@ def handle_client(conn, addr):
 def start_server():
     """Sunucuyu başlatır ve istemcilerden gelen bağlantıları kabul eder"""
     while True:
-        conn, addr = server.accept()  # Yeni bir bağlantı kabul edilir
+        conn, addr = server.accept() 
         threading.Thread(target=handle_client, args=(conn, addr)).start()
         
 

@@ -10,7 +10,7 @@ import pyaudio
 import threading
 
 # client_socket.connect(('0.tcp.ngrok.io', 19194))
-HOST = '81.17.95.30'
+HOST = '127.0.0.1'
 # HOST = '162.214.48.246'
 CAMERAPORT = 8095
 SOUNDPORT = 8094
