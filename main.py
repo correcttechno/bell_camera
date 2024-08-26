@@ -2,7 +2,7 @@
 import threading
 import cv2
 from flask import Flask, Response, render_template
-from client import setClientCameraFrame
+from simpleSocketclient import setClientCameraFrame
 from faceid import readFaceidFrame, setFaceIDCameraFrame
 
 

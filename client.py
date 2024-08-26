@@ -1,113 +1,44 @@
-import cv2
-import io
 import socket
-import struct
-import time
-import pickle
-import numpy as np
-import imutils
 import pyaudio
 import threading
 
+# Sunucu ayarları
+HOST = '127.0.0.1'  # Sunucunun IP adresi
+PORT = 8094
 
-
-# client_socket.connect(('0.tcp.ngrok.io', 19194))
-HOST = '81.17.95.30'
-#HOST = '162.214.48.246'
-CAMERAPORT = 8095
-SOUNDPORT=8094
-
+# Ses ayarları
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 48000
+RATE = 44100
 CHUNK_SIZE = 4096
-CAMERAFRAME=None
 
-try:
-    cameraSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cameraSocket.connect((HOST, CAMERAPORT))
-    cameraSocket.send("DOORBELL".encode('utf-8'))
-except:
-    print("Error camera socket")
-
-
-try:
-    soundSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soundSocket.connect((HOST, SOUNDPORT))
-    soundSocket.send("DOORBELL".encode('utf-8'))
-except:
-    print("Error sound socket")
-
-
-
-
-
-def cameraClient():
-    img_counter = 0
-    cam = cv2.VideoCapture(0)
-    encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),15]
-    try:
-        global CAMERAFRAME
-        while True:
-
-            cleanFrame=CAMERAFRAME
-            success, cleanFrame = cam.read()
-
-            if cleanFrame is not None:
-                frame=cleanFrame
-                #frame = imutils.resize(frame, width=320,height=240)
-            
-                frame = cv2.flip(frame,180)
-                result, image = cv2.imencode('.jpg', frame, encode_param)
-                data = pickle.dumps(image, 0)
-                size = len(data)
-
-                if True:
-                  
-                    if len(data)>0:
-                        cameraSocket.sendall(struct.pack(">L", size) + data)
-                    #cv2.imshow('client',frame)
-                    time.sleep(0.01)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    except:
-        print("Error camera socket")
-    
-
-
-def setClientCameraFrame(fr):
-    global CAMERAFRAME
-    CAMERAFRAME=fr
-    
-
-
+# İstemci soketi oluşturuluyor
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((HOST, PORT))
 
 audio = pyaudio.PyAudio()
-stream_in = audio.open(format=FORMAT, channels=CHANNELS,rate=RATE, input=True,
-                       input_device_index=11,
+
+# Giriş (mikrofon) stream
+stream_in = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True,
                        frames_per_buffer=CHUNK_SIZE)
- 
-def soundClient():
-    try:
-        while True:
-            sounddata = stream_in.read(CHUNK_SIZE,exception_on_overflow=False)
-        
-            if len(sounddata)>0:
-                soundSocket.sendall(sounddata)
-            
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    except:
-        print("Error sound socket")
-   
-        
 
+# Çıkış (hoparlör) stream
+stream_out = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True,
+                        frames_per_buffer=CHUNK_SIZE)
 
+def send_audio():
+    """Mikrofon verisini sunucuya gönderir"""
+    while True:
+        data = stream_in.read(CHUNK_SIZE)
+        client_socket.sendall(data)
 
+def receive_audio():
+    """Sunucudan gelen veriyi hoparlörden çalar"""
+    while True:
+        data = client_socket.recv(CHUNK_SIZE)
+        if data:
+            stream_out.write(data)
 
-
-
-
-
-threading.Thread(target=cameraClient).start()
-threading.Thread(target=soundClient).start()
+# İki thread başlatılıyor: biri ses göndermek diğeri almak için
+threading.Thread(target=send_audio).start()
+threading.Thread(target=receive_audio).start()
