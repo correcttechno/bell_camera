@@ -9,4 +9,11 @@ $(function () {
             index=0;
         }
     })
+
+
+    $('.doorbell').click(function(){
+        $.post('/bell',{},function(){
+            
+        })
+    })
 })

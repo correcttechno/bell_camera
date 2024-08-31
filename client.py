@@ -15,6 +15,8 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 CHUNK_SIZE = 4096
+cleanFrame = None
+
 
 audioClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 audioClientSocket.connect((HOST, AUDIOPORT))
@@ -23,7 +25,7 @@ videoClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 videoClientSocket.connect((HOST, VIDEOPORT))
 
 audio = pyaudio.PyAudio()
-video = cv2.VideoCapture(0)
+#video = cv2.VideoCapture(0)
 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 15]
 
 stream_in = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True,
@@ -42,11 +44,15 @@ def receiveAudio():
         data = audioClientSocket.recv(CHUNK_SIZE)
         if data:
             stream_out.write(data)
+#set camera frame
+def setClientCameraFrame(frame):
+    global cleanFrame
+    cleanFrame=frame
 #send video data
 def sendVideo():
+    global cleanFrame
     while True:
-        success, cleanFrame = video.read()
-    
+        #success, cleanFrame = video.read()
         if cleanFrame is not None:
             frame = cleanFrame
             # frame = imutils.resize(frame, width=320,height=240)
