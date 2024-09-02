@@ -8,7 +8,7 @@ import pyaudio
 import threading
 
 
-HOST = '127.0.0.1'  
+HOST = '192.168.1.11'  
 AUDIOPORT = 8094
 VIDEOPORT = 8095
 TEXTPORT=8096
