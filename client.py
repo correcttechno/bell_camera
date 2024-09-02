@@ -36,6 +36,7 @@ video =None
 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 15]
 
 stream_in = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True,
+                       input_device_index=11,
                        frames_per_buffer=CHUNK_SIZE)
 
 stream_out = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, output=True,
