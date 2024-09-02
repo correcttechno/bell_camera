@@ -9,7 +9,7 @@ from client import setClientCameraFrame
 
 
 app = Flask(__name__)
-cap = cv2.VideoCapture('dev/video0')
+cap = cv2.VideoCapture(0)
 
 #start face id and network
 setClientCameraFrame(cap)
