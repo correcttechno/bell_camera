@@ -5,6 +5,8 @@ import struct
 import threading
 
 import cv2
+from flask import json
+import requests
 
 #import pyaudio
 
@@ -16,9 +18,11 @@ import cv2
 HOST = '0.0.0.0' 
 AUDIOPORT = 8094
 VIDEOPORT = 8095
+TEXTPORT = 8096
 
 audioClients = []
 videoClients = []
+textClients=[]
 
 audioServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 audioServer.bind((HOST, AUDIOPORT))
@@ -27,6 +31,47 @@ audioServer.listen(5)
 videoServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 videoServer.bind((HOST, VIDEOPORT))
 videoServer.listen(5)
+
+textServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+textServer.bind((HOST, TEXTPORT))
+textServer.listen(5)
+
+#send noft
+myToken="ea80EBvNQqCMGu907dofEa:APA91bFfrtsQMkuHBGZeSdUTbU0MTzmV6Fj9pV_HgIkD402XGE4E-aTFt6lCZT1B-FO0ABDhNHMGqDZ7xgr0rvMtWq2T9cQ1NoXU3WT-KbT2hjm1Im7gcl55r6lF0lrE2xegSo5HdGoe"
+def send_notification(token, title, description, data=None, action='MESSAGING_EVENT'):
+    api_key = "AAAAaNeZ-Ok:APA91bGfED82PlJgTTkuuZGLsDJznXvQ88trskAfl2JOPuKE1Dc9TQDM475TnMxx0TYiHPGIgiRnxACjhkJjwy80mSZrj_BbGZ8Lymx2WhDrrs660o_alHb76Uwqmbv4T_FEj7iBNcRb"
+    
+    registration_ids = [token]
+    
+    # Mesajı hazırlama
+    msg = {
+        'body': description,
+        'title': title,
+        'clickAction': action
+    }
+
+    # Veri alanını ekleyelim
+    fields = {
+        "collapse_key": "type_a",
+        'registration_ids': registration_ids,
+        'notification': msg,
+    }
+
+    if data:
+        fields['data'] = data
+
+    headers = {
+        'Authorization': 'key=' + api_key,
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(fields))
+    
+    if response.status_code == 200:
+        return response.json().get('success', 0)
+    else:
+        return 0
+
 
 #Audio Server
 def audioBroadcast(data, conn):
@@ -108,15 +153,51 @@ def startVideoServer():
     while True:
         conn, addr = videoServer.accept() 
         threading.Thread(target=videoHandleClient, args=(conn, addr)).start()
+
+#Text Server
+def textBroadcast(data, conn):
+    #stream_out.write(data)
+    for client in textClients:
+        if client != conn:
+            try:
+                client.sendall(data)
+            except:
+               textClients.remove(client)
+#text handle
+def textHandleClient(conn, addr):
+    print(f"New connection from {addr}")
+    textClients.append(conn)
+    
+    while True:
+        try:
+            data = conn.recv(1024)  
+            if not data:
+                break
+            
+            if(data.decode()=="BELL"):
+                send_notification(myToken,"SALAM","BELL")
+                print("NOFT GONDERILDI")
+            #textBroadcast(data, conn)  
+        except:
+            break
+    
+    print(f"Connection from {addr} closed")
+    textClients.remove(conn)
+    conn.close()
+#start text server
+def startTextServer():
+    while True:
+        conn, addr = textServer.accept() 
+        threading.Thread(target=textHandleClient, args=(conn, addr)).start()
         
 
 #start servers
 threading.Thread(target=startAudioServer).start()
 threading.Thread(target=startVideoServer).start()
+threading.Thread(target=startTextServer).start()
 
 print("AUDIO SERVER STARTED")
 print("VIDEO SERVER STARTED")
-
-
+print("TEXT SERVER STARTED")
 
 

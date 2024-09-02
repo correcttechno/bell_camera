@@ -1,3 +1,4 @@
+from email import utils
 import pickle
 import socket
 import struct
@@ -10,6 +11,7 @@ import threading
 HOST = '127.0.0.1'  
 AUDIOPORT = 8094
 VIDEOPORT = 8095
+TEXTPORT=8096
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -24,8 +26,13 @@ audioClientSocket.connect((HOST, AUDIOPORT))
 videoClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 videoClientSocket.connect((HOST, VIDEOPORT))
 
+textClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+textClientSocket.connect((HOST, TEXTPORT))
+
+
+
 audio = pyaudio.PyAudio()
-#video = cv2.VideoCapture(0)
+video =None
 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 15]
 
 stream_in = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True,
@@ -45,26 +52,32 @@ def receiveAudio():
         if data:
             stream_out.write(data)
 #set camera frame
-def setClientCameraFrame(frame):
-    global cleanFrame
-    cleanFrame=frame
+def setClientCameraFrame(vd):
+    global video
+    video=vd
 #send video data
 def sendVideo():
-    global cleanFrame
+    global video
     while True:
-        #success, cleanFrame = video.read()
-        if cleanFrame is not None:
-            frame = cleanFrame
-            # frame = imutils.resize(frame, width=320,height=240)
-            frame = cv2.flip(frame, 180)
-            result, image = cv2.imencode('.jpg', frame, encode_param)
-            data = pickle.dumps(image, 0)
-            size = len(data)
-            if len(data) > 0:
-                videoClientSocket.sendall(struct.pack(">L", size) + data)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
+        if video is not None:
+          
+            success, frame = video.read()
+            if True:
+                frame = cv2.flip(frame, 180)
+                result, image = cv2.imencode('.jpg', frame, encode_param)
+                data = pickle.dumps(image, 0)
+                size = len(data)
+                if len(data) > 0:
+                    videoClientSocket.sendall(struct.pack(">L", size) + data)
+#send text data
+def sendText(MESSAGE):
+    textClientSocket.send(MESSAGE.encode())
+#recive text data
+def receiveText():
+    while True:
+        data = textClientSocket.recv(1024)
+        return data
+    
 #start functions
 threading.Thread(target=sendAudio).start()
 threading.Thread(target=receiveAudio).start()

@@ -5,7 +5,7 @@ import face_recognition
 import os
 
 
-CAMERAFRAME=None
+video=None
 # tanınan yüzlerin özellikleri
 known_faces = []
 
@@ -32,80 +32,81 @@ for filename in os.listdir(known_faces_dir):
 
 def faceIdCallback():
     global faceIdFrame
-    global CAMERAFRAME
+    global video
     while True:
         # video akışından bir kare al
-        frame = CAMERAFRAME
-        if frame is not None:
-            frame=cv2.resize(frame,(640,480))
-            
-            # kareyi yüzleri tanımak için işle
-            face_locations = face_recognition.face_locations(frame)
-            face_encodings = face_recognition.face_encodings(frame, face_locations)
+        if video is not None:
+            success,frame = video.read()
+            if True:
+                frame=cv2.resize(frame,(640,480))
+                
+                # kareyi yüzleri tanımak için işle
+                face_locations = face_recognition.face_locations(frame)
+                face_encodings = face_recognition.face_encodings(frame, face_locations)
 
-            # yüzleri tanımla ve kaydet
-            for face_encoding, face_location in zip(face_encodings, face_locations):
-                # yüz tanıma işlemi
-                matches = face_recognition.compare_faces(known_faces, face_encoding)
+                # yüzleri tanımla ve kaydet
+                for face_encoding, face_location in zip(face_encodings, face_locations):
+                    # yüz tanıma işlemi
+                    matches = face_recognition.compare_faces(known_faces, face_encoding)
 
-                # yüzü tanımak için kullanılan en iyi eşleşmenin dizini
-                best_match_index = -1
-                best_match_distance = 0.5
+                    # yüzü tanımak için kullanılan en iyi eşleşmenin dizini
+                    best_match_index = -1
+                    best_match_distance = 0.5
 
-                for i in range(len(matches)):
-                    if matches[i]:
-                        face_distance = face_recognition.face_distance([known_faces[i]], face_encoding)[0]
-                        if face_distance < best_match_distance:
-                            best_match_index = i
-                            best_match_distance = face_distance
+                    for i in range(len(matches)):
+                        if matches[i]:
+                            face_distance = face_recognition.face_distance([known_faces[i]], face_encoding)[0]
+                            if face_distance < best_match_distance:
+                                best_match_index = i
+                                best_match_distance = face_distance
 
-                # yüzü kaydetmek için eğer tanınmadıysa
-                if best_match_index == -1:
-                    # yüzü tanımlamak için bir isim girdisi al
-                    #name =input("Yeni bir yüz tanımlandı, lütfen ismini girin: ")
+                    # yüzü kaydetmek için eğer tanınmadıysa
+                    if best_match_index == -1:
+                        # yüzü tanımlamak için bir isim girdisi al
+                        #name =input("Yeni bir yüz tanımlandı, lütfen ismini girin: ")
 
-                    # yüzü kaydet
-                    #known_faces.append(face_encoding)
-                    #known_names.append(name)
+                        # yüzü kaydet
+                        #known_faces.append(face_encoding)
+                        #known_names.append(name)
 
-                    # yüzü dosya olarak kaydet
-                    #file_path = os.path.join(known_faces_dir, name + file_extension)
-                    #cv2.imwrite(file_path, frame)
+                        # yüzü dosya olarak kaydet
+                        #file_path = os.path.join(known_faces_dir, name + file_extension)
+                        #cv2.imwrite(file_path, frame)
+
+                        
+
+                        top, right, bottom, left = face_location
+                        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 1)
 
                     
+                    # yüz daha önce kaydedilmişse dosya ismini yazdır
+                    else:
+                        name = known_names[best_match_index]
 
-                    top, right, bottom, left = face_location
-                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 1)
+                        top, right, bottom, left = face_location
+                        cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 1)
+                        print(name)
 
-                
-                # yüz daha önce kaydedilmişse dosya ismini yazdır
-                else:
-                    name = known_names[best_match_index]
-
-                    top, right, bottom, left = face_location
-                    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 1)
-                    print(name)
-
-                    # yüz ismini dikdörtgenin üstüne yaz
-                    #cv2.rectangle(frame, (left, bottom - 20), (right, bottom), (0, 255, 0), cv2.FILLED)
-                    #font = cv2.FONT_HERSHEY_DUPLEX
-                    #cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
+                        # yüz ismini dikdörtgenin üstüne yaz
+                        #cv2.rectangle(frame, (left, bottom - 20), (right, bottom), (0, 255, 0), cv2.FILLED)
+                        #font = cv2.FONT_HERSHEY_DUPLEX
+                        #cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
 
 
-            # kareyi ekranda göster
-            #cv2.imshow('Video', frame)
-            faceIdFrame=frame
-            # q tuşuna basarak çıkış yap
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+                # kareyi ekranda göster
+                #cv2.imshow('Video', frame)
+                faceIdFrame=frame
+                # q tuşuna basarak çıkış yap
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
 
     # kaynakları serbest bırak
 def readFaceidFrame():
     global faceIdFrame
     return faceIdFrame
 
-def setFaceIDCameraFrame(fr):
-    global CAMERAFRAME
-    CAMERAFRAME=fr
+def setFaceIDCameraFrame(vd):
+    global video
+    video=vd
    
-threading.Thread(target=faceIdCallback,daemon=True).start()
+threading.Thread(target=faceIdCallback).start()

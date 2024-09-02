@@ -1,33 +1,25 @@
 import threading
+import time
 import cv2
 from flask import Flask, Response, render_template, render_template_string
-from client import sendVideo, setClientCameraFrame
-from faceid import readFaceidFrame, setFaceIDCameraFrame
+from client import setClientCameraFrame
+from faceid import setFaceIDCameraFrame
+
+
 
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
 
-CAMERAFRAME=None
+#start face id and network
+setClientCameraFrame(cap)
+setFaceIDCameraFrame(cap)
 
-
-def read_camera():
-    global CAMERAFRAME
-    while True:
-        ret,frame =cap.read()
-        if not ret:
-            break
-        CAMERAFRAME=frame
-        setClientCameraFrame(frame)
-        setFaceIDCameraFrame(frame)
-
-
+#generate http live
 def generate_frames():
-    global CAMERAFRAME
     while True:
-        frame=CAMERAFRAME
-        
-        if CAMERAFRAME is None:
+        ret,frame=cap.read()
+        if not ret:
             break
         _, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
@@ -44,10 +36,10 @@ def index():
 
 @app.route('/bell',methods=['POST'])
 def bell():
+    #sendText("BELL")
     return render_template_string("Salam")
 
 if __name__ == '__main__':
-
-    threading.Thread(target=read_camera).start()
+    
     app.run(host='0.0.0.0', port=80, debug=False)
 
