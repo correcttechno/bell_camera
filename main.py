@@ -3,7 +3,7 @@ import time
 import cv2
 from flask import Flask, Response, render_template, render_template_string
 from client import setClientCameraFrame
-#from faceid import setFaceIDCameraFrame
+from faceid import setFaceIDCameraFrame
 
 
 

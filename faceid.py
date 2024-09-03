@@ -19,20 +19,26 @@ known_faces_dir = '/home/msb/bell_camera/known_faces'
 file_extension = '.jpg'
 
 faceIdFrame=None
-# önceden kaydedilmiş yüzleri oku
-for filename in os.listdir(known_faces_dir):
-    name = os.path.splitext(filename)[0]
-    known_names.append(name)
 
-    file_path = os.path.join(known_faces_dir, filename)
-    image = face_recognition.load_image_file(file_path)
-    face_encoding = face_recognition.face_encodings(image)[0]
-    known_faces.append(face_encoding)
+def startPathScanner():
+    global known_faces
+    global known_names
+    # önceden kaydedilmiş yüzleri oku
+    for filename in os.listdir(known_faces_dir):
+        name = os.path.splitext(filename)[0]
+        known_names.append(name)
+
+        file_path = os.path.join(known_faces_dir, filename)
+        image = face_recognition.load_image_file(file_path)
+        face_encoding = face_recognition.face_encodings(image)[0]
+        known_faces.append(face_encoding)
 
 
 def faceIdCallback():
     global faceIdFrame
     global video
+    global known_faces
+    global known_names
     while True:
         # video akışından bir kare al
         if video is not None:
@@ -108,5 +114,6 @@ def readFaceidFrame():
 def setFaceIDCameraFrame(vd):
     global video
     video=vd
-   
+
+threading.Thread(target=startPathScanner).start()
 threading.Thread(target=faceIdCallback).start()

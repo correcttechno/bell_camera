@@ -8,7 +8,7 @@ import pyaudio
 import threading
 
 
-HOST = '192.168.1.11'  
+HOST = '81.17.95.30'  
 AUDIOPORT = 8094
 VIDEOPORT = 8095
 TEXTPORT=8096
@@ -27,7 +27,7 @@ videoClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 videoClientSocket.connect((HOST, VIDEOPORT))
 
 textClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-textClientSocket.connect((HOST, TEXTPORT))
+#textClientSocket.connect((HOST, TEXTPORT))
 
 
 
