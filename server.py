@@ -1,4 +1,5 @@
 import pickle
+import random
 import socket
 import socketserver
 import struct
@@ -6,6 +7,7 @@ import threading
 
 import cv2
 from flask import json
+import numpy as np
 import requests
 
 #import pyaudio
@@ -124,25 +126,30 @@ def videoHandleClient(conn, addr):
     data = b""
     payload_size = struct.calcsize(">L")
     encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+    n=random.random()
     while True:
         try:
-            while len(data) < payload_size:
-                data += conn.recv(50*1024)
-            packed_msg_size = data[:payload_size]
-            data = data[payload_size:]
-            msg_size = struct.unpack(">L", packed_msg_size)[0]
-            while len(data) < msg_size:
-                data += conn.recv(50*1024)
-            frame_data = data[:msg_size]
-            data = data[msg_size:]
-            frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
-            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-            frame = cv2.flip(frame,180)
-            result, image = cv2.imencode('.jpg', frame, encode_param)
-            if conn is not None:
-                mydata = struct.pack('>L', len(image.tobytes())) + image.tobytes()
-                videoBroadcast(mydata, conn)
+            data = b''
+            if True:
+                packet = conn.recv(100000)
+                if not packet:
+                    break
+                videoBroadcast(packet,conn)
+                data = packet
+                
+            if len(data) > 0:
+                nparr = np.frombuffer(data, np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                data = b''  # Veriyi sıfırla
+
+                    # Görüntüyü göster
+                if frame is not None:
+                    cv2.imshow('Camera Stream'+str(n), frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+
         except:
+            print("ERROR")
             break
             
     print(f"Connection from {addr} closed")
